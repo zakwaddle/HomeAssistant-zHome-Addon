@@ -1,6 +1,6 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const config = require('../zrc')
+const config = require('./zrc')
 
 console.log(config.mode)
 
