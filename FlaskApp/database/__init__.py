@@ -8,7 +8,7 @@ from .models import (
 )
 import os
 
-engine = create_engine(os.getenv('DATABASE_URI'), pool_size=20)
+engine = create_engine(os.getenv('DATABASE_URI'))
 ModelBase.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 
