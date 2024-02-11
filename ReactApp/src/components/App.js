@@ -20,7 +20,7 @@ const AppContainer = styled.div`
 `
 
 export default function App() {
-    useSSE();
+    // useSSE();
     const menuSelection = useSelector(state => state['globalState']['menuSelection'])
     return (
         <AppContainer>
