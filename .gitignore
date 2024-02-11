@@ -269,3 +269,4 @@ google_token.json
 MQTT-LogApi/log_entries.db
 !/MQTT-Firmware/Firmware/HomeModule/home/lib/
 !/MQTT-Firmware/Firmware/HomeModule/dist/
+/FlaskApp/static/react
