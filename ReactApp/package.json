@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "view logs posted by home automation microcontrollers",
   "scripts": {
-    "build": "webpack --config build/webpack.config.js",
-    "watch": "webpack --config build/webpack.config.js --watch",
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js --watch",
     "start": "npx webpack serve",
     "start:dev": "concurrently \"npm run watch\" \"npm run start\""
   },
