@@ -1,0 +1,10 @@
+{
+  "host": "http://yawntsum.local",
+  "wifi_ssid": "the_interwebs",
+  "wifi_password": "935Ravine",
+  "hard_pins": [
+    {"pin": 25, "type":  "light"},
+    {"pin": 26, "type":  "light"},
+    {"pin": 27, "type":  "sensor"}
+  ]
+}
