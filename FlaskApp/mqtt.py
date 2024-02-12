@@ -1,11 +1,12 @@
 import functools
 from paho.mqtt import client as mqtt
+from paho.mqtt.enums import CallbackAPIVersion
 
 
 def mqtt_decorator(func):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        mqtt_client = mqtt.Client()
+        mqtt_client = mqtt.Client(CallbackAPIVersion(2))
 
         def on_pub(*args):
             mqtt_client.disconnect()
