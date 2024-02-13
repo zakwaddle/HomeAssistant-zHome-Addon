@@ -270,5 +270,5 @@ MQTT-LogApi/log_entries.db
 !/MQTT-Firmware/Firmware/HomeModule/home/lib/
 !/MQTT-Firmware/Firmware/HomeModule/dist/
 /FlaskApp/static/react
-/FlaskApp/data/*
+/FlaskApp/data/
 FlaskApp/data/log_entries.db
