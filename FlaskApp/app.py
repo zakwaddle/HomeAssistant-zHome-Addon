@@ -15,24 +15,18 @@ import requests
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-SUP_TOK = os.getenv("SUPERVISOR_TOKEN")
-print(SUP_TOK)
-req = requests.get("http://supervisor/services/", headers={"Authorization": f"Bearer {SUP_TOK}"})
-print("services request status code: ", req.status_code)
-print(req.text)
-try:
-    print(req.json())
-except Exception as e:
-    print(e)
 
-req = requests.get("http://supervisor/services/mqtt", headers={"Authorization": f"Bearer {SUP_TOK}"})
-print("mqtt request status code: ", req.status_code)
-print(req.text)
-try:
-    print(req.json())
-except Exception as e:
-    print(e)
-print("mqtt stuff: ", os.getenv("MQTT_HOST"), os.getenv("MQTT_PORT"), os.getenv("MQTT_USERNAME"))
+def get_mqtt_details():
+    SUP_TOK = os.getenv("SUPERVISOR_TOKEN")
+    if SUP_TOK is not None:
+        print("obtained HA superviser token")
+        req = requests.get("http://supervisor/services/mqtt", headers={"Authorization": f"Bearer {SUP_TOK}"})
+        if req.status_code == 200:
+            print("obtained mqtt details")
+            try:
+                return req.json()['data']
+            except Exception as e:
+                print(e)
 
 
 def on_connect(client, userdata, flags, rc, props):
@@ -49,12 +43,19 @@ def on_message(client, userdata, msg):
 
 
 def start_mqtt_loop():
+    mqtt_details = get_mqtt_details()
+    un = mqtt_details.get('username')
+    pw = mqtt_details.get('password')
+    host = mqtt_details.get('host')
+    port = mqtt_details.get('port')
+
     mqtt_client = mqtt.Client(CallbackAPIVersion(2))
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
-    mqtt_client.username_pw_set("Zak", "935Ravine")
 
-    mqtt_client.connect("homeassistant.local", 1883, 60)
+    mqtt_client.username_pw_set(un, pw)
+
+    mqtt_client.connect(host, port, 60)
     mqtt_client.loop_forever()
 
 

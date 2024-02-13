@@ -1,6 +1,6 @@
 {
   "name": "zHome",
-  "version": "1.03",
+  "version": "1.08",
   "slug": "zhome",
   "description": "A custom Flask-React app integration for Home Assistant.",
   "arch": ["amd64", "aarch64", "armhf", "armv7"],

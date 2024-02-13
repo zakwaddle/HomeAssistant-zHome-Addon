@@ -22,5 +22,5 @@ ENV DATABASE_URI=sqlite:////data/log_entries.db
 EXPOSE 5000
 
 # Run Flask app
-#CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
-CMD ["./run.sh"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+# CMD ["./run.sh"]
