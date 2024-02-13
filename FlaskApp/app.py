@@ -4,14 +4,46 @@ from blueprints.devices import device_blueprint
 from blueprints.sensors import sensor_blueprint
 from blueprints.configs import config_blueprint
 from flask_cors import CORS
+from paho.mqtt import client as mqtt
+from paho.mqtt.enums import CallbackAPIVersion
+from threading import Thread
+from database import add_log
+import json
 import os
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
 
+def on_connect(client, userdata, flags, rc, props):
+    print("Connected with result code " + str(rc))
+    client.subscribe("z-home/log/#")
+
+
+def on_message(client, userdata, msg):
+    print(msg.topic + " " + str(msg.payload))
+    # Logic to log message to database
+    log_mes = json.loads(msg.payload)
+    log = {"log": log_mes, "topic": msg.topic}
+    add_log(log)
+
+
+def start_mqtt_loop():
+    mqtt_client = mqtt.Client(CallbackAPIVersion(2))
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+    mqtt_client.username_pw_set("Zak", "935Ravine")
+
+    mqtt_client.connect("homeassistant.local", 1883, 60)
+    mqtt_client.loop_forever()
+
+
+thread = Thread(target=start_mqtt_loop)
+thread.start()
+
+
 # Serve React App
-@app.route('/', defaults={'path': ''})
+@app.route('/dashboard', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
     if path != "" and os.path.exists(app.static_folder + '/react/' + path):
@@ -24,7 +56,6 @@ app.register_blueprint(log_blueprint, url_prefix='/api/home/logs')
 app.register_blueprint(device_blueprint, url_prefix='/api/home/devices')
 app.register_blueprint(sensor_blueprint, url_prefix='/api/home/sensors')
 app.register_blueprint(config_blueprint, url_prefix='/api/home/configs')
-
 
 if __name__ == "__main__":
     app.run("0.0.0.0")

@@ -15,11 +15,12 @@ ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=5000
-ENV FLASK_DEBUG=True
-ENV DATABASE_URI=sqlite:////app/data/log_entries.db
+ENV FLASK_DEBUG=False
+ENV DATABASE_URI=sqlite:////data/log_entries.db
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
 # Run Flask app
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+#CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["./run.sh"]
