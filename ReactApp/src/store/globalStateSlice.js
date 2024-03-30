@@ -16,7 +16,8 @@ const initialState = {
     selectedDevice: null,
     selectedSensor: null,
     showConnectionForm: 'None',
-    shouldUpdateDevices: true
+    shouldUpdateDevices: true,
+    shouldUpdateLogs: true,
 
 }
 const globalStateSlice = createSlice({
@@ -81,6 +82,9 @@ const globalStateSlice = createSlice({
         },
         updateShouldUpdateDevices(state, action) {
             state.shouldUpdateDevices = action.payload
+        },
+        updateShouldUpdateLogs(state, action) {
+            state.shouldUpdateLogs = action.payload
         },
     }
 })

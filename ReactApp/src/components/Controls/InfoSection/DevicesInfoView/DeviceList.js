@@ -1,6 +1,5 @@
-import React, {useState} from "react";
+import React from "react";
 import styled from "styled-components";
-import useApi from "../../../../hooks/useApi";
 import {useDispatch, useSelector} from "react-redux";
 import {globalStateActions} from "../../../../store/globalStateSlice";
 import {PropStack} from "../../../UI/Property";
@@ -49,13 +48,6 @@ const DeviceContainer = styled.div`
     height: ${props => props['hide'] ? '0' : 'content-box'}; // hide the element by reducing its height
   }
 `
-const Button = styled.button`
-  font-family: monospace;
-  font-size: inherit;
-  background-color: inherit;
-  border-radius: .3em;
-  border-width: 1px;
-`
 
 const Device = ({deviceData}) => {
     const dispatch = useDispatch()
@@ -82,7 +74,6 @@ const Device = ({deviceData}) => {
 }
 export const DeviceList = ({selectedDevice, setSelectedDevice}) => {
     const devices = useSelector(state => state['globalState']['devices'])
-    // console.log(devices)
     return (
         <DeviceListContainer hasSelected={selectedDevice !== null}>
             {devices.map(device => <Device key={device.id}
@@ -90,46 +81,6 @@ export const DeviceList = ({selectedDevice, setSelectedDevice}) => {
                                            selected={selectedDevice}
                                            setSelected={setSelectedDevice}/>)}
         </DeviceListContainer>
-    )
-}
-
-
-const DeviceSetupBox = styled.div`
-  width: 95%;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease-in-out; // Add transition effect here
-
-`
-const DeviceSetupRow = styled.div`
-  width: 95%;
-  display: flex;
-  justify-content: space-evenly;
-`
-export const DeviceSetup = ({device, setShowSetup}) => {
-    const [newName, setNewName] = useState("")
-
-    const {updateDeviceName} = useApi()
-
-    const handleCancel = () => setShowSetup(false)
-    const handleSetup = () => {
-        updateDeviceName(device.id, newName).then(setShowSetup(false))
-    }
-    return (
-        <DeviceSetupBox>
-            <DeviceSetupRow>
-                {device.platform}
-                {device.id}
-            </DeviceSetupRow>
-            <DeviceSetupRow>
-                Display Name
-                <input value={newName} onChange={event => setNewName(event.target.value)}/>
-            </DeviceSetupRow>
-            <DeviceSetupRow>
-                <Button onClick={handleCancel}>Cancel</Button>
-                <Button onClick={handleSetup}>Save</Button>
-            </DeviceSetupRow>
-        </DeviceSetupBox>
     )
 }
 

@@ -5,6 +5,7 @@ import styled from "styled-components";
 import AddMotionSensorForm from "./AddMotionSensorForm";
 import AddWeatherSensorForm from "./AddWeatherSensorForm";
 import AddLEDDimmerForm from "./AddLEDDimmerForm";
+import {Button} from "../../../../styles/SectionStyles";
 
 const AddSensorContainer = styled.div`
   width: 100%;
@@ -22,12 +23,18 @@ const AddSensorView = () => {
     const selectedDevice = useSelector(state => state['globalState']['selectedDevice'])
     const config = selectedDevice.config
 
-    const [sensorType, setSensorType] = useState('motion');
+    const [sensorType, setSensorType] = useState('');
 
-    const handleChange = (event) => setSensorType(event.target.value)
     const setDetailsView = () => dispatch(globalStateActions.updateDetailsSectionView('main'))
     const updateDevice = () => dispatch(globalStateActions.updateShouldUpdateDevices(true))
     const sensorForms = {
+        "": (
+            <Wrapper>
+                <Button onClick={() => setSensorType('motion')}>Motion Sensor</Button>
+                <Button onClick={() => setSensorType('weather')}>Weather Sensor</Button>
+                <Button onClick={() => setSensorType('led')}>LED Dimmer</Button>
+            </Wrapper>
+        ),
         "motion": <AddMotionSensorForm updateDevice={updateDevice}
                                        deviceName={selectedDevice.display_name}
                                        deviceConfigId={config.id}
@@ -43,16 +50,7 @@ const AddSensorView = () => {
     }
     return (
         <AddSensorContainer>
-            <div>
-                <select onChange={handleChange}>
-                    <option value={'motion'}>Motion Sensor</option>
-                    <option value={'weather'}>Weather Sensor</option>
-                    <option value={'led'}>LED Dimmer</option>
-                </select>
-            </div>
-
             {sensorForms[sensorType]}
-
         </AddSensorContainer>
 
     );

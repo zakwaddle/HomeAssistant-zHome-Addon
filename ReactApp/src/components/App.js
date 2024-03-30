@@ -3,7 +3,7 @@ import GlobalStyle from "../styles/GlobalStyles";
 import styled from 'styled-components';
 import LogSection from "./Logs";
 import ControlSection from "./Controls/ControlSection";
-import useSSE from "../hooks/useSSE";
+// import useSSE from "../hooks/useSSE";
 import Menu from "./Controls/Menu/Menu";
 import {useSelector} from "react-redux";
 

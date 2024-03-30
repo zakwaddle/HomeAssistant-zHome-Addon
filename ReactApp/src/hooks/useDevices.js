@@ -4,33 +4,35 @@ import useApi from "./useApi";
 import {globalStateActions} from "../store/globalStateSlice";
 
 
-const useDevices = () => {
+const useDevices = (pollingSeconds) => {
     const dispatch = useDispatch();
     const shouldUpdateDevices = useSelector(state => state['globalState']['shouldUpdateDevices'])
     const selectedDevice = useSelector(state => state['globalState']['selectedDevice'])
     const {fetchDevices} = useApi();
+
     useEffect(() => {
-
-        if (shouldUpdateDevices){
-            let selectedDeviceId
-            if(selectedDevice){
-                selectedDeviceId = selectedDevice.id
-            }
+        let timeout;
+        if (shouldUpdateDevices) {
+            let selectedDeviceId = selectedDevice ? selectedDevice.id : null;
             fetchDevices().then(data => {
-                const newDevices = data.filter(device => device.display_name === null)
-                // const devices = data.filter(device => device.display_name !== null)
-                const devices = data
-                if (selectedDeviceId){
-                    const selected = data.filter(device => device.id === selectedDeviceId)
-                    selected && dispatch(globalStateActions.updateSelectedDevice(selected[0]))
+                const devices = data;
+                if (selectedDeviceId) {
+                    const selected = devices.find(device => device.id === selectedDeviceId);
+                    if (selected) dispatch(globalStateActions.updateSelectedDevice(selected));
                 }
-
                 dispatch(globalStateActions.updateDevices(devices));
-                dispatch(globalStateActions.updateNewDevices(newDevices));
                 dispatch(globalStateActions.updateShouldUpdateDevices(false));
+                // console.log("updated devices")
             });
+        } else if (pollingSeconds){
+            timeout = setTimeout(
+                () => dispatch(globalStateActions.updateShouldUpdateDevices(true)),
+                pollingSeconds * 1000);
         }
+
+        return () => clearTimeout(timeout);
     }, [shouldUpdateDevices]);
+
 
 }
 

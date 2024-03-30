@@ -1,14 +1,24 @@
 #!/bin/zsh
 
-SOURCE_DIR="/Users/zakwaddle/MQTT-Log/MQTT-LogApi/"
-DEST_DIR="zak@yawntsum.local:~/local_services/home-mqtt-log/log-api/"
-EXCLUDE_PATTERNS=('.idea/' '__pycache__/' 'venv/' 'sync.zsh' 'log_entries.db')
+SOURCE_DIR="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/"
+DEST_DIR="root@homeassistant.local:~/addons/FlaskApp/"
 
-RSYNC_OPTIONS=(-avz)
+# List of directories and files to exclude
+EXCLUDE_PATTERNS=('.idea' '__pycache__' '.pyc' '*/__pycache__' 'venv' 'data' 'tests' 'sync.zsh' 'log_entries.db')
 
-for pattern in "${EXCLUDE_PATTERNS[@]}"
-do
-  RSYNC_OPTIONS+=("--exclude=$pattern")
-done
+# Function to copy files excluding the specified patterns
+copy_files_excluding() {
+    for file in "$SOURCE_DIR"*; do
+        skip=
+        for pattern in "${EXCLUDE_PATTERNS[@]}"; do
+            if [[ "$file" == *"$pattern"* ]]; then
+                skip=1
+                break
+            fi
+        done
+        [[ -n $skip ]] || scp -r "$file" "$DEST_DIR"
+    done
+}
 
-rsync "${RSYNC_OPTIONS[@]}" "$SOURCE_DIR" "$DEST_DIR"
+# Execute the copy function
+copy_files_excluding

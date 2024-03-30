@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-// import Menu from "./Menu/Menu";
 import useConnections from "../../hooks/useConnections";
 import DetailSection from "./DetailsSection";
 import InfoSection from "./InfoSection";
@@ -70,14 +69,13 @@ const DetailsWindow = styled.div`
 `
 const ControlSection = () => {
     useConnections()
-    useDevices()
+    useDevices(10)
     const selectedDevice = useSelector(state => state['globalState']['selectedDevice'])
     const menuSelection = useSelector(state => state['globalState']['menuSelection'])
     const isVisible = menuSelection === 'Devices' && !!selectedDevice
 
     return (
         <ControlSectionBox>
-            {/*<Menu/>*/}
             <InfoWindow hasSelected={selectedDevice !== null}>
                 <InfoSection/>
             </InfoWindow>
