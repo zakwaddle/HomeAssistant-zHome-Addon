@@ -1,5 +1,5 @@
 import home.Home
-from .sensors import HomeMotionSensor, HomeWeatherSensor, HomeLEDDimmer
+from .sensors import HomeMotionSensor, HomeWeatherSensor, HomeLEDDimmer, HomeFan
 
 
 class SensorManager:
@@ -21,6 +21,8 @@ class SensorManager:
                 self.create_motion_sensor(name, sensor_config, topics, sensor_index)
             elif sensor_type == "led":
                 self.create_led_dimmer(name, sensor_config, topics, sensor_index)
+            elif sensor_type == "fan":
+                self.create_fan(name, sensor_config, topics, sensor_index)
             elif sensor_type == "weather":
                 self.create_weather_sensor(name, sensor_config, topics, sensor_index)
 
@@ -36,6 +38,13 @@ class SensorManager:
         led.publish_brightness()
         led.publish_state()
         self.sensors.append(led)
+
+    def create_fan(self, name, sensor_config, topics, sensor_index):
+        fan = HomeFan(self.home_client, name, sensor_config, topics, sensor_index)
+        fan.publish_discovery(self.device_info)
+        fan.publish_percentage()
+        fan.publish_state()
+        self.sensors.append(fan)
 
     def create_weather_sensor(self, name, sensor_config, topics, sensor_index):
         measurement_interval_ms = sensor_config.get('measurement_interval_ms')
