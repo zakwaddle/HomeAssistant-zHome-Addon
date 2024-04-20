@@ -1,5 +1,5 @@
 {
-  "host": "http://yawntsum.local",
+  "host": "http://homeassistant.local:5000",
   "wifi_ssid": "the_interwebs",
   "wifi_password": "935Ravine",
   "hard_pins": [
