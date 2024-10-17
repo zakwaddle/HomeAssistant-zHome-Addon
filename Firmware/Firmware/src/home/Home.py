@@ -128,9 +128,11 @@ class Home:
 
     def start_sequence(self):
         self.config_manager.get_startup_settings()
-        self.connect_wifi(self.config_manager.wifi_ssid, self.config_manager.wifi_password)
+        wifi = self.config_manager.wifi
+        self.connect_wifi(wifi.ssid, wifi.password)
         self.config_manager.obtain_config()
         self.config_manager.parse_config()
+        self.config_manager.update_device_on_home_server()
         self.connect_mqtt()
         self.connect_ftp()
 
@@ -175,6 +177,7 @@ class Home:
         :param topic: The topic to publish the message to.
         :param message: The message to be published.
         """
+        # print(f"\n--- publshing to topic: {topic}\n--- payload:{message}")
         self.mqtt_manager.publish(topic, message, **kwargs)
 
     def subscribe(self, topic):
@@ -200,3 +203,6 @@ class Home:
 
     def mqtt_ping(self):
         self.mqtt_manager.ping()
+
+    def mqtt_set_last_will(self, topic, message):
+        self.mqtt_manager.set_last_will(topic=topic, message=message)

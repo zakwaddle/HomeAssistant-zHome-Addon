@@ -1,6 +1,6 @@
 import json
 import urequests
-import home.Home as home
+import home
 import sys
 import machine
 import ubinascii
@@ -11,22 +11,22 @@ class ConfigError(Exception):
 
 
 class WifiConfig:
-    def __init__(self, id, ssid, password, is_default):
+    def __init__(self, ssid, password):
         self.ssid = ssid
         self.password = password
 
 
 class MQTTConfig:
-    def __init__(self, id, host_address, port, username, password, is_default):
-        self.host = host_address
+    def __init__(self, host, port, username, password):
+        self.host = host
         self.port = port
         self.username = username
         self.password = password
 
 
 class FTPConfig:
-    def __init__(self, id, host_address, username, password, is_default):
-        self.host = host_address
+    def __init__(self, host, username, password):
+        self.host = host
         self.username = username
         self.password = password
 
@@ -84,9 +84,16 @@ class ConfigManager:
 
     def get_startup_settings(self):
         self.start_up_settings = self.__load_startup_settings()
-        self.host = self.start_up_settings.get('host')
-        self.wifi_ssid = self.start_up_settings.get('wifi_ssid')
-        self.wifi_password = self.start_up_settings.get('wifi_password')
+        print('Home Version: ', self.start_up_settings.get("version"))
+
+        self.host = self.start_up_settings.get('api')
+        wifi = self.start_up_settings.get('wifi')
+        ftp = self.start_up_settings.get('fpt')
+        mqtt = self.start_up_settings.get('mqtt')
+        
+        self.wifi = WifiConfig(**wifi) if wifi is not None else None
+        self.mqtt = MQTTConfig(**mqtt) if mqtt is not None else None
+        self.ftp = FTPConfig(**ftp) if ftp is not None else None
 
     def request_device_config(self):
         url = f'{self.host}/api/home/devices/{self.device_id}'
@@ -105,14 +112,24 @@ class ConfigManager:
             "device_info": {
                 "name": self.name,
                 "manufacturer": "ZRW",
-                "model": f"{self.platform.upper()}-Circuit",
-                "identifiers": self.device_id
+                "model": f"{self.platform.upper()}-{self.start_up_settings.get('model')}",
+                "identifiers": self.device_id,
+                "sw_version": self.start_up_settings.get('version')
             }})
         print("announcing device...")
         if response.status_code == 200:
             data = response.json()
             print("device added")
             self.home_device = data['device']
+
+    def update_device_on_home_server(self):
+        firmware_version = self.start_up_settings.get('version')
+        if self.device_info.get("sw_version") != firmware_version:
+            response = urequests.post(f'{self.host}/api/home/devices/{self.device_id}/firmware_version', json={
+                "sw_version": self.start_up_settings.get('version')
+                })
+            if response.status_code == 200:
+                print("updated version on home server")
 
     def parse_config(self):
         self.name = self.home_device.get('display_name')
@@ -127,12 +144,6 @@ class ConfigManager:
             use_ping = device_settings.get('use_ping')
             self.use_ping = use_ping if use_ping is not None else self.use_ping
 
-        wifi_config = self.device_config.get('wifi_network')
-        mqtt_config = self.device_config.get('mqtt_broker')
-        ftp_config = self.device_config.get('ftp_server')
-        self.wifi = WifiConfig(**wifi_config) if wifi_config is not None else None
-        self.mqtt = MQTTConfig(**mqtt_config) if mqtt_config is not None else None
-        self.ftp = FTPConfig(**ftp_config) if ftp_config is not None else None
 
     def obtain_config(self):
         self.request_device_config()
@@ -142,6 +153,7 @@ class ConfigManager:
             self.__load_last_run_config()
         if self.home_device is None:
             self.announce_device_to_home_server()
+        
         if self.home_device is None:
             raise ConfigError('Unable to locate device configs')
 

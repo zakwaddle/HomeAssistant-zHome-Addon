@@ -1,7 +1,7 @@
 from .Home import Home
 import utime
 
-__version__ = '0.0.10'
+# __version__ = '0.0.10'
 
 
 def run():
@@ -9,7 +9,7 @@ def run():
         home_client = Home()
         try:
 
-            print('Home Version: ', __version__)
+            # print('Home Version: ', __version__)
             home_client.start_sequence()
             home_client.log("---listening for messages---")
             while True:

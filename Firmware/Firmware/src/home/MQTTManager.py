@@ -92,3 +92,11 @@ class MQTTManager:
             print("OSError - possibly lost connection to broker")
             self.is_connected = False
             utime.sleep(3)
+
+    def set_last_will(self, topic: str, message: str):
+        try:
+            self.mqtt_client.set_last_will(topic=topic, msg=message)
+        except OSError:
+            print("OSError - possibly lost connection to broker")
+            self.is_connected = False
+            utime.sleep(3)

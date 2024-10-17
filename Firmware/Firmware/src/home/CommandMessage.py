@@ -1,5 +1,5 @@
 import json
-import home.Home as home
+import home
 import home.UpdateManager as udm
 
 UpdateError = udm.UpdateError

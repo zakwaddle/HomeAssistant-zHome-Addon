@@ -69,6 +69,20 @@ def update_display_name(device_id, new_name):
     return data
 
 
+def update_firmware_version(device_id, new_version):
+    with Session() as session:
+        try:
+            device = session.query(HomeDevice).filter(HomeDevice.id == device_id).one()
+            device_info = {**device.device_info, 'sw_version': new_version}
+            device.device_info = device_info
+            print(device.device_info)
+            session.commit()
+            data = device.to_dict()
+        except NoResultFound:
+            data = None
+    return data
+
+
 def add_device(device):
     with Session() as session:
         new_device = HomeDevice(**device)

@@ -97,11 +97,6 @@ class MQTTDimmableLight:
         self.brightness_state_topic = brightness_state_topic
         self.brightness_command_topic = brightness_command_topic
         self.discovery_topic = discovery_topic
-        # self.topic = f"homeassistant/light/{self.mqtt_client.unit_id}/{self.name.lower().replace(' ', '_')}"
-        # self.state_topic = f"{self.topic}/state"
-        # self.command_topic = f"{self.topic}/set"
-        # self.brightness_state_topic = f"{self.topic}/dim"
-        # self.brightness_command_topic = f"{self.topic}/dim/set"
         self.subscribe_to = [self.command_topic, self.brightness_command_topic]
 
     def publish_state(self):

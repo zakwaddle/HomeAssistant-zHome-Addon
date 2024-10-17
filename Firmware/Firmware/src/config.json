@@ -1,10 +1,31 @@
 {
-  "host": "http://homeassistant.local:5000",
-  "wifi_ssid": "the_interwebs",
-  "wifi_password": "935Ravine",
+  "version": "0.0.11",
+  
+  "api": "http://homeassistant.local:5000",
+
+  "wifi": {
+    "ssid": "the_interwebs",
+    "password": "935Ravine"
+  },
+
+  "ftp": {
+    "host": "homeassistant.local",
+    "username" : "microcontrollers",
+    "password" : "microcontrollers"
+  },
+
+  "mqtt": {
+    "host": "homeassistant.local",
+    "port": 1883,
+    "username": "Zak",
+    "password": "935Ravine"
+  },
+
   "hard_pins": [
     {"pin": 25, "type":  "light"},
     {"pin": 26, "type":  "light"},
     {"pin": 27, "type":  "sensor"}
-  ]
+  ],
+
+  "model": "dev-board"
 }

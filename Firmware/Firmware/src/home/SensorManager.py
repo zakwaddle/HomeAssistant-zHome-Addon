@@ -1,5 +1,5 @@
 import home.Home
-from .sensors import HomeMotionSensor, HomeWeatherSensor, HomeLEDDimmer, HomeFan
+from .sensors import HomeMotionSensor, HomeWeatherSensor, HomeLEDDimmer, HomeFan, HomeButton
 
 
 class SensorManager:
@@ -25,12 +25,22 @@ class SensorManager:
                 self.create_fan(name, sensor_config, topics, sensor_index)
             elif sensor_type == "weather":
                 self.create_weather_sensor(name, sensor_config, topics, sensor_index)
+            elif sensor_type == "button":
+                self.create_button(name, sensor_config, topics, sensor_index)
 
     def create_motion_sensor(self, name, sensor_config, topics, sensor_index):
         motion = HomeMotionSensor(self.home_client, name, sensor_config, topics, sensor_index)
         motion.publish_discovery(self.device_info)
         motion.enable_interrupt()
         self.sensors.append(motion)
+
+    def create_button(self, name, sensor_config, topics, sensor_index):
+        button = HomeButton(self.home_client, name, sensor_config, topics, sensor_index)
+        button.publish_discovery(self.device_info)
+        button.enable_interrupt()
+        button.publish_available()
+        button.set_last_will()
+        self.sensors.append(button)
 
     def create_led_dimmer(self, name, sensor_config, topics, sensor_index):
         led = HomeLEDDimmer(self.home_client, name, sensor_config, topics, sensor_index)
