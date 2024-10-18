@@ -73,7 +73,9 @@ def update_firmware_version(device_id, new_version):
     with Session() as session:
         try:
             device = session.query(HomeDevice).filter(HomeDevice.id == device_id).one()
+            print(device)
             device_info = {**device.device_info, 'sw_version': new_version}
+            print(device_info)
             device.device_info = device_info
             print(device.device_info)
             session.commit()

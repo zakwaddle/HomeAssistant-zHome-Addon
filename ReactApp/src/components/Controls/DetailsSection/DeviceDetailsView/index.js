@@ -227,6 +227,10 @@ const DeviceDetailsView = () => {
                     <PropertyValue>{config.id}</PropertyValue>
                 </Property>
                 <Property>
+                    <PropertyTitle>Firmware Version</PropertyTitle>
+                    <PropertyValue>{selectedDevice['device_info']['sw_version']}</PropertyValue>
+                </Property>
+                <Property>
                     <PropertyTitle>Platform</PropertyTitle>
                     <PropertyValue>{selectedDevice['platform']}</PropertyValue>
                 </Property>

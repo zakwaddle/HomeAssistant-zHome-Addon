@@ -90,10 +90,12 @@ class Home:
 
     def connect_ftp(self):
         if self.config_manager.ftp is not None:
+            print('\nconnecting FTP')
             self.update_manager = UpdateManager(observer_func=self.log,
                                                 host=self.config_manager.ftp.host,
                                                 user=self.config_manager.ftp.username,
                                                 password=self.config_manager.ftp.password)
+            
 
     def check_connections(self):
         """

@@ -42,7 +42,6 @@ class FirmwareUploader:
         self.ftp_uploader.upload_file('./manifest.json', f'{self.ftp_home_folder}/manifest.json')
 
     def upload_home_package(self):
-        # self.ftp_uploader.create_directory("/upload/Firmware")
 
         self.create_home_package_folder()
         print("clearing home folder")

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Source and destination directories
-src_dir="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/Firmware/src/home"
-dest_dir="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/Firmware/dist/home"
+src_dir="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/Firmware/Firmware/src/home"
+dest_dir="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/Firmware/Firmware/dist/home"
 
 # Check if destination directory exists, create if not
 if [ ! -d "$dest_dir" ]; then

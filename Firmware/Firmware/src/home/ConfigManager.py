@@ -88,7 +88,7 @@ class ConfigManager:
 
         self.host = self.start_up_settings.get('api')
         wifi = self.start_up_settings.get('wifi')
-        ftp = self.start_up_settings.get('fpt')
+        ftp = self.start_up_settings.get('ftp')
         mqtt = self.start_up_settings.get('mqtt')
         
         self.wifi = WifiConfig(**wifi) if wifi is not None else None
@@ -103,6 +103,7 @@ class ConfigManager:
         if response.status_code == 200:
             print(f'received settings')
             self.home_device = response.json()
+            print(self.home_device)
 
     def announce_device_to_home_server(self):
         response = urequests.post(f'{self.host}/api/home/devices/add', json={
@@ -124,12 +125,18 @@ class ConfigManager:
 
     def update_device_on_home_server(self):
         firmware_version = self.start_up_settings.get('version')
-        if self.device_info.get("sw_version") != firmware_version:
-            response = urequests.post(f'{self.host}/api/home/devices/{self.device_id}/firmware_version', json={
-                "sw_version": self.start_up_settings.get('version')
+        server_device = self.home_device if self.home_device is not None else None
+        device_info = server_device.get('device_info') if server_device is not None else None
+        server_version = device_info.get("sw_version")
+        print(server_version, firmware_version)
+        if device_info.get("sw_version") != firmware_version:
+            response = urequests.post(f'{self.host}/api/home/devices/{self.home_device.get('id')}/firmware_version', json={
+                "new_version": firmware_version
                 })
             if response.status_code == 200:
                 print("updated version on home server")
+                data = response.json()
+                print(data)
 
     def parse_config(self):
         self.name = self.home_device.get('display_name')

@@ -64,6 +64,7 @@ class CommandMessage:
 
     def update(self):
         manifest_path = self.instructions.get("manifest_path")
+        print('received update command. manifest path: ', manifest_path)
         if manifest_path is not None:
             self.home_client.update_manager.download_update_from_manifest(manifest_path)
             print('downloaded update')
