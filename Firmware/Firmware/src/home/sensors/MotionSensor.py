@@ -1,6 +1,7 @@
 import machine
 import json
 from ..Timer import Timer
+import time
 
 
 class MotionSensor:
@@ -86,14 +87,14 @@ class MQTTMotionSensor:
             "state_topic": self.state_topic
         }
         if self.availability_topic is not None:
-            config = {"availability": [{'topic': self.availability_topic}], **config}
+            config["availability"] = [{'topic': self.availability_topic}]
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
 
     def publish_availability(self):
         if self.availability_topic is not None:
             self.mqtt_client.publish(self.availability_topic, "online")
-            print(f"\nPublished Fan Availability: online")
+            print(f"\nPublished Motion Availability: online")
 
 
 class HomeMotionSensor(MQTTMotionSensor):
@@ -115,6 +116,7 @@ class HomeMotionSensor(MQTTMotionSensor):
 
 
     def force_update(self):
-        self.publish_availability
-        self.publish_last_motion
+        self.publish_availability()
+        time.sleep(1)
+        self.publish_last_motion()
 

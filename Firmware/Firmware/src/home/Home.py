@@ -162,15 +162,18 @@ class Home:
     def on_message(self, topic, msg):
 
         self.sensor_manager.on_message(topic, msg)
-        
+
         tp = topic.decode('utf-8')
+        ms = msg.decode('utf-8')
         if tp == self.ha_topic:
-            for i in self.sensors:
-                try:
-                    i.force_update()
-                except Exception as e:
-                    self.log(f'message error: {e}', log_level=1)
-                    print(f'message error: {e}')
+            if ms == "online":
+                for i in self.sensor_manager.sensors:
+                    try:
+                        i.force_update()
+                    except Exception as e:
+                        self.log(f'message error: {e}')
+                        print(f'message error: {e}')
+                self.log("force updated sensors")
 
         def should_respond():
             t = topic.decode('utf-8')

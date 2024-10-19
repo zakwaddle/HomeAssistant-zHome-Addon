@@ -136,7 +136,7 @@ class MQTTDimmableLight:
 
         }
         if self.availability_topic is not None:
-            config = {"availability": [{'topic': self.availability_topic}], **config}
+            config["availability"] = [{'topic': self.availability_topic}]
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
     def on_message(self, topic, msg):
@@ -191,6 +191,6 @@ class HomeLEDDimmer(MQTTDimmableLight):
         return f"<HomeLEDDimmer| {self.name} | pin:{self.pin}>"
 
     def force_update(self):
-        self.publish_availability
-        self.publish_state
-        self.publish_brightness
+        self.publish_availability()
+        self.publish_state()
+        self.publish_brightness()

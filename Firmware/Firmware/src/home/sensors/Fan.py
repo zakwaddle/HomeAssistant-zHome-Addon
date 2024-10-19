@@ -108,7 +108,7 @@ class MQTTFan:
 
         }
         if self.availability_topic is not None:
-            config = {"availability": [{'topic': self.availability_topic}], **config}
+            config["availability"] = [{'topic': self.availability_topic}]
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
     def on_message(self, topic, msg):
@@ -154,7 +154,7 @@ class HomeFan(MQTTFan):
         return f"<HomeFan| {self.name} | pin:{self.pin}>"
 
     def force_update(self):
-        self.publish_availability
-        self.publish_state
-        self.publish_percentage
+        self.publish_availability()
+        self.publish_state()
+        self.publish_percentage()
 

@@ -32,6 +32,7 @@ class SensorManager:
         motion = HomeMotionSensor(self.home_client, name, sensor_config, topics, sensor_index)
         motion.publish_discovery(self.device_info)
         motion.enable_interrupt()
+        motion.publish_availability()
         self.sensors.append(motion)
 
     def create_button(self, name, sensor_config, topics, sensor_index):
@@ -45,6 +46,7 @@ class SensorManager:
     def create_led_dimmer(self, name, sensor_config, topics, sensor_index):
         led = HomeLEDDimmer(self.home_client, name, sensor_config, topics, sensor_index)
         led.publish_discovery(self.device_info)
+        led.publish_availability()
         led.publish_brightness()
         led.publish_state()
         self.sensors.append(led)
@@ -52,6 +54,7 @@ class SensorManager:
     def create_fan(self, name, sensor_config, topics, sensor_index):
         fan = HomeFan(self.home_client, name, sensor_config, topics, sensor_index)
         fan.publish_discovery(self.device_info)
+        fan.publish_availability()
         fan.publish_percentage()
         fan.publish_state()
         self.sensors.append(fan)
