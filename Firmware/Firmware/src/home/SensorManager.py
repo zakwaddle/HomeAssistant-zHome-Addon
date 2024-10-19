@@ -33,6 +33,7 @@ class SensorManager:
         motion.publish_discovery(self.device_info)
         motion.enable_interrupt()
         motion.publish_availability()
+        motion.publish_last_motion()
         self.sensors.append(motion)
 
     def create_button(self, name, sensor_config, topics, sensor_index):
@@ -55,8 +56,8 @@ class SensorManager:
         fan = HomeFan(self.home_client, name, sensor_config, topics, sensor_index)
         fan.publish_discovery(self.device_info)
         fan.publish_availability()
-        fan.publish_percentage()
         fan.publish_state()
+        fan.publish_percentage()
         self.sensors.append(fan)
 
     def create_weather_sensor(self, name, sensor_config, topics, sensor_index):
