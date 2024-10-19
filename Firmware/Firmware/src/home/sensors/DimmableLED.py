@@ -109,10 +109,15 @@ class MQTTDimmableLight:
         self.mqtt_client.publish(self.brightness_state_topic, str(self.light.target_brightness))
         print(f"\nPublished Brightness: {self.light.target_brightness}")
 
-    def publish_availability(self):
+    def publish_online(self):
         if self.availability_topic is not None:
             self.mqtt_client.publish(self.availability_topic, "online")
             print(f"\nPublished LED Availability: online")
+
+    def publish_offline(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "offline")
+            print(f"\nPublished LED Availability: offline")
 
     def set_name(self, name):
         self.name = name
@@ -191,6 +196,6 @@ class HomeLEDDimmer(MQTTDimmableLight):
         return f"<HomeLEDDimmer| {self.name} | pin:{self.pin}>"
 
     def force_update(self):
-        self.publish_availability()
+        self.publish_online()
         self.publish_state()
         self.publish_brightness()

@@ -32,7 +32,7 @@ class SensorManager:
         motion = HomeMotionSensor(self.home_client, name, sensor_config, topics, sensor_index)
         motion.publish_discovery(self.device_info)
         motion.enable_interrupt()
-        motion.publish_availability()
+        motion.publish_online()
         motion.publish_last_motion()
         self.sensors.append(motion)
 
@@ -40,14 +40,14 @@ class SensorManager:
         button = HomeButton(self.home_client, name, sensor_config, topics, sensor_index)
         button.publish_discovery(self.device_info)
         button.enable_interrupt()
-        button.publish_available()
+        button.publish_online()
         button.set_last_will()
         self.sensors.append(button)
 
     def create_led_dimmer(self, name, sensor_config, topics, sensor_index):
         led = HomeLEDDimmer(self.home_client, name, sensor_config, topics, sensor_index)
         led.publish_discovery(self.device_info)
-        led.publish_availability()
+        led.publish_online()
         led.publish_brightness()
         led.publish_state()
         self.sensors.append(led)
@@ -55,7 +55,7 @@ class SensorManager:
     def create_fan(self, name, sensor_config, topics, sensor_index):
         fan = HomeFan(self.home_client, name, sensor_config, topics, sensor_index)
         fan.publish_discovery(self.device_info)
-        fan.publish_availability()
+        fan.publish_online()
         fan.publish_state()
         fan.publish_percentage()
         self.sensors.append(fan)
@@ -63,8 +63,9 @@ class SensorManager:
     def create_weather_sensor(self, name, sensor_config, topics, sensor_index):
         measurement_interval_ms = sensor_config.get('measurement_interval_ms')
         weather = HomeWeatherSensor(self.home_client, name, sensor_config, topics, sensor_index)
-        weather.publish_discovery(self.device_info)
         weather.enable_interrupt(measurement_interval_ms)
+        weather.publish_discovery(self.device_info)
+        weather.publish_online()
         self.sensors.append(weather)
 
     def subscribe_sensors(self):

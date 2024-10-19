@@ -82,10 +82,15 @@ class MQTTFan:
         self.mqtt_client.publish(self.percentage_state_topic, str(self.fan.percentage))
         print(f"\nPublished Percentage: {self.fan.percentage}")
 
-    def publish_availability(self):
+    def publish_online(self):
         if self.availability_topic is not None:
             self.mqtt_client.publish(self.availability_topic, "online")
             print(f"\nPublished Fan Availability: online")
+
+    def publish_offline(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "offline")
+            print(f"\nPublished Fan Availability: offline")
 
     def set_name(self, name):
         self.name = name
@@ -154,7 +159,7 @@ class HomeFan(MQTTFan):
         return f"<HomeFan| {self.name} | pin:{self.pin}>"
 
     def force_update(self):
-        self.publish_availability()
+        self.publish_online()
         self.publish_state()
         self.publish_percentage()
 

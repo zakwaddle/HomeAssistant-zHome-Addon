@@ -33,8 +33,10 @@ const AddWeatherSensorForm = ({deviceConfigId, deviceName, handleCancel, updateD
                 topics: {
                     temperature_topic: temperatureTopic,
                     temperature_discovery: `${temperatureTopic}/config`,
+                    temperature_availability_topic: `${temperatureTopic}/available`,
                     humidity_topic: humidityTopic,
                     humidity_discovery: `${humidityTopic}/config`,
+                    humidity_availability_topic: `${humidityTopic}/available`,
                 }
 
 

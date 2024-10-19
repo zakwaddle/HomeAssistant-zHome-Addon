@@ -90,10 +90,15 @@ class MQTTMotionSensor:
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
 
-    def publish_availability(self):
+    def publish_online(self):
         if self.availability_topic is not None:
             self.mqtt_client.publish(self.availability_topic, "online")
             print(f"\nPublished Motion Availability: online")
+
+    def publish_offline(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "offline")
+            print(f"\nPublished Motion Availability: offline")
 
 
 class HomeMotionSensor(MQTTMotionSensor):
@@ -115,6 +120,6 @@ class HomeMotionSensor(MQTTMotionSensor):
 
 
     def force_update(self):
-        self.publish_availability()
+        self.publish_online()
         self.publish_last_motion()
 

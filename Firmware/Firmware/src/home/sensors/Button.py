@@ -81,9 +81,13 @@ class MQTTButton:
         print("publishing button press to ", self.command_topic)
         self.mqtt_client.publish(self.command_topic, "NO PRESS")
 
-    def publish_available(self):
+    def publish_online(self):
         """Publish the last motion detected to the MQTT topic."""
         self.mqtt_client.publish(self.availability_topic, "online")
+
+    def publish_offline(self):
+        """Publish the last motion detected to the MQTT topic."""
+        self.mqtt_client.publish(self.availability_topic, "offline")
 
     def set_last_will(self):
         """Publish the last motion detected to the MQTT topic."""
@@ -120,4 +124,4 @@ class HomeButton(MQTTButton):
         return f"<HomeButton| {self.name} | pin:{self.pin}>"
 
     def force_update(self):
-        self.publish_available()
+        self.publish_online()
