@@ -1,7 +1,6 @@
 import machine
 import json
 from ..Timer import Timer
-import time
 
 
 class MotionSensor:
@@ -46,7 +45,7 @@ class MotionSensor:
             if self.on_motion_detected is not None:
                 self.on_motion_detected()
 
-    # def _no_motion_detected(self, _):
+
     def _no_motion_detected(self):
         self.last_motion = 0
         if self.on_motion_not_detected is not None:
@@ -117,6 +116,5 @@ class HomeMotionSensor(MQTTMotionSensor):
 
     def force_update(self):
         self.publish_availability()
-        time.sleep(1)
         self.publish_last_motion()
 
