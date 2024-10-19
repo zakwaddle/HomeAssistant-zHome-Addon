@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, jsonify
 from blueprints.logs import log_blueprint
 from blueprints.devices import device_blueprint
 from blueprints.sensors import sensor_blueprint
@@ -71,7 +71,12 @@ def serve_react_app(path):
         return send_from_directory(app.static_folder + '/react', path)
     else:
         return send_from_directory(app.static_folder + '/react', 'index.html')
-
+    
+@app.route('/api/mqtt')
+def serve_mqtt_details():
+    mqtt_details = get_mqtt_details()
+    return jsonify(mqtt_details)
+    
 
 app.register_blueprint(log_blueprint, url_prefix='/api/home/logs')
 app.register_blueprint(device_blueprint, url_prefix='/api/home/devices')

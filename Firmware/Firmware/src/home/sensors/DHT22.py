@@ -37,11 +37,6 @@ class MQTTDHT22Sensor:
         self.temp_discovery_topic = temp_discovery_topic
         self.humidity_topic = humidity_topic
         self.humidity_discovery_topic = humidity_discovery_topic
-        # self.base_topic = f"homeassistant/sensor/{self.mqtt_client.unit_id}"
-        # self.temp_topic = f"{self.base_topic}/{self.name_temp.lower().replace(' ', '_')}"
-        # self.temp_discovery_topic = f"{self.temp_topic}/config"
-        # self.humidity_topic = f"{self.base_topic}/{self.name_humidity.lower().replace(' ', '_')}"
-        # self.humidity_discovery_topic = f"{self.humidity_topic}/config"
 
         self.timer = None
         self.measurement_errors = 0
@@ -52,7 +47,6 @@ class MQTTDHT22Sensor:
             self.dht22_sensor.measure()
             temperature = self.dht22_sensor.temperature()
             humidity = self.dht22_sensor.humidity()
-            # self.publish_measurement(temperature, humidity)
             self.measurement_errors = 0
             self.active = True
             return temperature, humidity
@@ -60,7 +54,7 @@ class MQTTDHT22Sensor:
             print(f"Weather Measurement Error: {e}")
             self.mqtt_client.log(f"Weather Measurement Error: {e}")
             self.measurement_errors += 1
-            if self.measurement_errors > 5:
+            if self.measurement_errors >= 10:
                 if self.timer is not None:
                     self.timer.stop()
                     print("Disabled Weather Timer")
@@ -133,3 +127,7 @@ class HomeWeatherSensor(MQTTDHT22Sensor):
 
     def __repr__(self):
         return f"<HomeWeatherSensor| {self.name} | pin:{self.pin}>"
+
+
+    def force_update(self):
+        self.measure_and_publish()

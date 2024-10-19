@@ -118,3 +118,6 @@ class HomeButton(MQTTButton):
 
     def __repr__(self):
         return f"<HomeButton| {self.name} | pin:{self.pin}>"
+
+    def force_update(self):
+        self.publish_available()

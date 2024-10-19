@@ -23,6 +23,7 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
         const formattedDeviceName = deviceName.toLowerCase().replace(' ', '_')
         const topic = `homeassistant/fan/${formattedDeviceName}/${formattedName}`
         const discoveryTopic = `${topic}/config`
+        const availabilityTopic = `${topic}/availability`
         const stateTopic = `${topic}/state`
         const commandTopic = `${topic}/set`
         const percentageStateTopic = `${topic}/dim/state`
@@ -38,7 +39,8 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
                     state_topic: stateTopic,
                     command_topic: commandTopic,
                     percentage_state_topic: percentageStateTopic,
-                    percentage_command_topic: percentageCommandTopic
+                    percentage_command_topic: percentageCommandTopic,
+                    availability_topic: availabilityTopic
                 }
 
             }).then(data => {

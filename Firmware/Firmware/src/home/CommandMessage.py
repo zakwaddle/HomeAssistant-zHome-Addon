@@ -62,10 +62,17 @@ class CommandMessage:
         if new_host is not None:
             self.home_client.config_manager.update_host(new_host)
 
+    def update_log_level(self):
+        new_log_level = self.instructions.get("log_level")
+        if new_log_level is not None:
+            self.home_client.config_manager.update_log_level(int(new_log_level))
+
     def update(self):
         manifest_path = self.instructions.get("manifest_path")
         print('received update command. manifest path: ', manifest_path)
+        self.home_client.log('received update command. starting update', log_type='update', log_level=1)
         if manifest_path is not None:
             self.home_client.update_manager.download_update_from_manifest(manifest_path)
             print('downloaded update')
+            self.home_client.log('finished update. restarting', log_type='update', log_level=1)
             self.home_client.restart_device(3)

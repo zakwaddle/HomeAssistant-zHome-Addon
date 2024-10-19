@@ -54,10 +54,6 @@ const AddButtonForm = ({deviceConfigId, deviceName, handleCancel, updateDevice})
                 Pin
                 <FormInput type="number" value={pin} onChange={e => setPin(Number(e.target.value))}/>
             </FormLabel>
-            {/* <FormLabel>
-                Re-Trigger Delay (ms)
-                <FormInput type="number" value={retrigDelay} onChange={e => setRetrigDelay(Number(e.target.value))}/>
-            </FormLabel> */}
 
             <div>
                 <Button onClick={handleCancel && handleCancel}>Cancel</Button>

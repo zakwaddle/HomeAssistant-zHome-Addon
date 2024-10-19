@@ -53,7 +53,8 @@ class MotionSensor:
 
 
 class MQTTMotionSensor:
-    def __init__(self, motion_sensor: MotionSensor, mqtt_client, name=None, state_topic=None, discovery_topic=None):
+    def __init__(self, motion_sensor: MotionSensor, mqtt_client, name=None, 
+                 state_topic=None, discovery_topic=None, availability_topic=None):
         self.motion_sensor = motion_sensor
         self.mqtt_client = mqtt_client
         self.sensor_index = self.motion_sensor.timer_n
@@ -61,6 +62,7 @@ class MQTTMotionSensor:
         self.name = name
         self.state_topic = state_topic
         self.discovery_topic = discovery_topic
+        self.availability_topic = availability_topic
         self.motion_sensor.set_on_motion_detected(self.publish_last_motion)
         self.motion_sensor.set_on_motion_not_detected(self.publish_last_motion)
 
@@ -83,7 +85,15 @@ class MQTTMotionSensor:
             "payload_on": "1",
             "state_topic": self.state_topic
         }
+        if self.availability_topic is not None:
+            config = {"availability": [{'topic': self.availability_topic}], **config}
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
+
+
+    def publish_availability(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "online")
+            print(f"\nPublished Fan Availability: online")
 
 
 class HomeMotionSensor(MQTTMotionSensor):
@@ -94,9 +104,17 @@ class HomeMotionSensor(MQTTMotionSensor):
                          name=name,
                          state_topic=topics.get('state_topic'),
                          discovery_topic=topics.get('discovery_topic'),
+                         availability_topic=topics.get('availability_topic'),
                          motion_sensor=MotionSensor(pin=self.pin,
                                                     retrigger_delay_ms=retrigger_delay_ms,
                                                     timer_n=sensor_index))
 
+
     def __repr__(self):
         return f"<HomeMotionSensor| {self.name} | pin:{self.pin}>"
+
+
+    def force_update(self):
+        self.publish_availability
+        self.publish_last_motion
+

@@ -16,6 +16,7 @@ class HomeError(Exception):
 
 
 class Home:
+    log_level = 1
     wifi_manager: WiFiManager = None
     mqtt_manager: MQTTManager = None
     update_manager: UpdateManager = None
@@ -45,27 +46,32 @@ class Home:
         light = StatusLED()
         light.blink_light()
 
-    def log(self, log_message, log_type='info'):
+    def log(self, log_message, log_type='info', log_level=1):
         print(log_message)
-        if self.mqtt_manager is not None and self.mqtt_manager.is_connected:
+        can_log = self.mqtt_manager is not None and self.mqtt_manager.is_connected
+        should_log = self.log_level <= log_level
+        if can_log and should_log:
             self.publish(self.log_topic, json.dumps({
                 "unit_id": self.config_manager.device_id,
                 "display_name": self.config_manager.name,
                 "message": log_message,
-                "type": log_type
+                "type": log_type,
+                "level": log_level,
+                "version": self.config_manager.version
             }))
 
     def restart_on_error(self, error_message):
-        self.log(f'{error_message} - Restarting', log_type='error')
+        self.log(f'{error_message} - Restarting', log_type='error', log_level=1)
         self.status_led_off()
         self.restart_device(delay_seconds=5)
 
     def __init__(self):
+        self.log("initializing home client", log_level=5)
         self.config_manager = ConfigManager(self)
         self.device_id = self.config_manager.device_id
         if self.config_manager.platform not in ['rp2', 'esp32']:
             raise HomeError(f"Unsupported platform: {self.config_manager.platform}")
-
+        self.ha_topic = "homeassistant/status"
         self.command_topic = f"command/#"
         self.log_topic = f"z-home/log/{self.device_id}"
         self.timer = None
@@ -125,6 +131,7 @@ class Home:
     def setup_subscriptions(self):
         self.set_callback(self.on_message)
         self.subscribe(self.command_topic)
+        self.subscribe(self.ha_topic)
         if self.sensor_manager is not None:
             self.sensor_manager.subscribe_sensors()
 
@@ -155,6 +162,15 @@ class Home:
     def on_message(self, topic, msg):
 
         self.sensor_manager.on_message(topic, msg)
+        
+        tp = topic.decode('utf-8')
+        if tp == self.ha_topic:
+            for i in self.sensors:
+                try:
+                    i.force_update()
+                except Exception as e:
+                    self.log(f'message error: {e}', log_level=1)
+                    print(f'message error: {e}')
 
         def should_respond():
             t = topic.decode('utf-8')

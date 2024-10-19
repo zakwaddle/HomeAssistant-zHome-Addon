@@ -1,7 +1,7 @@
 {
-  "version": "0.0.12",
-  
-  "api": "http://homeassistant.local:5000",
+  "version": "0.0.14",
+  "host": "homeassistant",
+  "log_level": 1,
 
   "wifi": {
     "ssid": "the_interwebs",
@@ -12,13 +12,6 @@
     "host": "homeassistant.local",
     "username" : "microcontrollers",
     "password" : "microcontrollers"
-  },
-
-  "mqtt": {
-    "host": "homeassistant.local",
-    "port": 1883,
-    "username": "Zak",
-    "password": "935Ravine"
   },
 
   "hard_pins": [

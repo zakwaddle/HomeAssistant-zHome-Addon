@@ -18,3 +18,6 @@ do
     mkdir -p "$dest_path"
     mpy-cross "$file" -o "${dest_file%.py}.mpy"
 done
+
+cp "${src_dir}/../main.py" "${dest_dir}/../main.py"
+cp "${src_dir}/../config.json" "${dest_dir}/../config.json"

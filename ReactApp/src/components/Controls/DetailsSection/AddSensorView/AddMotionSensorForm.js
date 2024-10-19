@@ -22,6 +22,7 @@ const AddMotionSensorForm = ({deviceConfigId, deviceName, handleCancel, updateDe
         const baseTopic = `homeassistant/binary_sensor/${formattedDeviceName}/${formattedName}`
         const stateTopic = `${baseTopic}/state`
         const discoveryTopic = `${baseTopic}/config`
+        const availabilityTopic = `${baseTopic}/availability`
 
         addSensor("motion", name, deviceConfigId,
             {
@@ -29,7 +30,8 @@ const AddMotionSensorForm = ({deviceConfigId, deviceName, handleCancel, updateDe
                 retrigger_delay_ms: retrigDelay,
                 topics: {
                     state_topic: stateTopic,
-                    discovery_topic: discoveryTopic
+                    discovery_topic: discoveryTopic,
+                    availability_topic: availabilityTopic
                 }
 
             }).then(data => {
