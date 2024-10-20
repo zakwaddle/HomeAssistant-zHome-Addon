@@ -87,14 +87,18 @@ class MQTTDHT22Sensor:
                            callback=self.measure_and_publish)
 
     def publish_online(self):
-        if self.humidity_availibility_topic is not None and self.temp_availibility_topic is not None:
+        has_hum = self.humidity_availibility_topic is not None
+        has_temp = self.temp_availibility_topic is not None
+        if has_hum and has_temp:
             self.mqtt_client.publish(self.humidity_availibility_topic, "online")
-            self.mqtt_client.publish(self.temp_availibility_topic_availibility_topic, "online")
+            self.mqtt_client.publish(self.temp_availibility_topic, "online")
 
     def publish_offline(self):
-        if self.humidity_availibility_topic is not None and self.temp_availibility_topic is not None:
+        has_hum = self.humidity_availibility_topic is not None
+        has_temp = self.temp_availibility_topic is not None
+        if has_hum and has_temp:
             self.mqtt_client.publish(self.humidity_availibility_topic, "offline")
-            self.mqtt_client.publish(self.temp_availibility_topic_availibility_topic, "offline")
+            self.mqtt_client.publish(self.temp_availibility_topic, "offline")
 
     def publish_discovery(self, device_info):
         print(f"\n{self.name_temp} Discovery Topic: {self.temp_discovery_topic}")
@@ -120,7 +124,10 @@ class MQTTDHT22Sensor:
             "device": device_info,
             "unique_id": f"{self.mqtt_client.device_id}-{self.sensor_index}_humidity",
         }
-        if self.humidity_availibility_topic is not None and self.temp_availibility_topic is not None:
+        
+        has_hum = self.humidity_availibility_topic is not None
+        has_temp = self.temp_availibility_topic is not None
+        if has_hum and has_temp:
             config_temp['availability'] = [{"topic": self.temp_availibility_topic}]
             config_humidity['availability'] = [{"topic": self.humidity_availibility_topic}]
 
@@ -143,7 +150,7 @@ class HomeWeatherSensor(MQTTDHT22Sensor):
                          name_humidity=name_humidity,
                          humidity_topic=topics.get('humidity_topic'),
                          humidity_discovery_topic=topics.get('humidity_discovery'),
-                         humidity_availibility_topic=topics.get('humidity_availibility_topic'),
+                         humidity_availibility_topic=topics.get('humidity_availability_topic'),
                          timer_n=sensor_index)
 
     def __repr__(self):
