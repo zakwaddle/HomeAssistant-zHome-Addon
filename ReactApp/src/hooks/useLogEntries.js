@@ -8,13 +8,17 @@ export default function useLogEntries(pollingSeconds=null){
     const dispatch = useDispatch();
     const {fetchLogs} = useApi();
     const shouldUpdateLogs = useSelector(state => state['globalState']['shouldUpdateLogs'])
+    const logs = useSelector(state => state['globalState']['deviceLogs'])
 
 
     useEffect(() => {
         let timeout;
         if (shouldUpdateLogs) {
             fetchLogs().then(data => {
-                dispatch(globalStateActions.updateDeviceLogs(data));
+                if (data.length !== logs.length){
+                    dispatch(globalStateActions.updateDeviceLogs(data));
+                    dispatch(globalStateActions.updateShouldScroll(true));
+                }
                 dispatch(globalStateActions.updateShouldUpdateLogs(false));
                 // console.log("checked for logs");
             });

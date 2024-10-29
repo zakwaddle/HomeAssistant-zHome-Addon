@@ -1,8 +1,7 @@
 import machine
-# import sys
 import dht
 import json
-from ..Timer import Timer
+from .Timer import Timer
 
 
 class DHT22Sensor:
@@ -139,6 +138,7 @@ class HomeWeatherSensor(MQTTDHT22Sensor):
     def __init__(self, home_client, name, sensor_config, topics, sensor_index):
         self.pin = sensor_config.get('pin')
         self.name = name
+        self.sensor_config = sensor_config
         name_temp = sensor_config.get('name_temp')
         name_humidity = sensor_config.get('name_humidity')
         super().__init__(dht22_sensor=DHT22Sensor(pin=self.pin),
@@ -156,6 +156,11 @@ class HomeWeatherSensor(MQTTDHT22Sensor):
     def __repr__(self):
         return f"<HomeWeatherSensor| {self.name} | pin:{self.pin}>"
 
+    def setup(self, device_info):
+        measurement_interval_ms = self.sensor_config.get('measurement_interval_ms')
+        self.enable_interrupt(measurement_interval_ms)
+        self.publish_discovery(device_info)
+        self.publish_online()
 
     def force_update(self):
         self.publish_online()

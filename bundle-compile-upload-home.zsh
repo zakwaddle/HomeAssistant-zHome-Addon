@@ -1,13 +1,7 @@
 #!/bin/bash
 
-cd ./ReactApp
-npm run build
-cd ..
+/usr/local/bin/python3 ./bundleHome.py  
 
-cd ./FlaskApp
-./sync.zsh
-
-cd ..
-./compileHome.zsh
+./compileBuildFolder.zsh
 
 /usr/local/bin/python3 ./Firmware/UpdateScripts/upload_firmware.py      

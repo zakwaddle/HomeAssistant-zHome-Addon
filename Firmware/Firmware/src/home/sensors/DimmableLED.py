@@ -194,6 +194,12 @@ class HomeLEDDimmer(MQTTDimmableLight):
 
     def __repr__(self):
         return f"<HomeLEDDimmer| {self.name} | pin:{self.pin}>"
+    
+    def setup(self, device_info):
+        self.publish_discovery(device_info)
+        self.publish_online()
+        self.publish_brightness()
+        self.publish_state()
 
     def force_update(self):
         self.publish_online()

@@ -1,6 +1,6 @@
 {
   "name": "mqtt-log-viewer",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "view logs posted by home automation microcontrollers",
   "scripts": {
     "build": "webpack --config webpack.config.js",

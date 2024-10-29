@@ -30,3 +30,9 @@ SOURCE_FILE="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/database
 DEST_DIR2="root@homeassistant.local:~/addons/FlaskApp/database/"
 
 scp -r "$SOURCE_FILE" "$DEST_DIR2"
+
+
+SOURCE_FILE3="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/.flaskenv"
+DEST_DIR3="root@homeassistant.local:~/addons/FlaskApp/"
+
+scp -r "$SOURCE_FILE3" "$DEST_DIR3"

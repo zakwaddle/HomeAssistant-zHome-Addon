@@ -58,6 +58,8 @@ const Device = ({deviceData}) => {
         if (isSelected) {
             dispatch(globalStateActions.updateSelectedDevice(null))
         } else {
+            dispatch(globalStateActions.updateDetailsSectionView('main'))
+            dispatch(globalStateActions.updateSelectedSensor(null))
             dispatch(globalStateActions.updateSelectedDevice(deviceData))
 
         }

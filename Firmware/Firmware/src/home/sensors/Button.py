@@ -1,6 +1,6 @@
 import machine
 import json
-from ..Timer import Timer
+from .Timer import Timer
 
 
 class Button:
@@ -122,6 +122,12 @@ class HomeButton(MQTTButton):
 
     def __repr__(self):
         return f"<HomeButton| {self.name} | pin:{self.pin}>"
+
+    def setup(self, device_info):
+        self.publish_discovery(device_info)
+        self.enable_interrupt()
+        self.publish_online()
+        self.set_last_will()
 
     def force_update(self):
         self.publish_online()

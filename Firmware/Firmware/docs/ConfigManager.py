@@ -4,6 +4,7 @@ import home
 import sys
 import machine
 import ubinascii
+import os
 
 
 class ConfigError(Exception):
@@ -35,6 +36,7 @@ class ConfigManager:
     version = None
     start_up_settings_path = '/config.json'
     last_run_config_path = '/last-run-config.json'
+    hard_pins_path = '/hard_pins.json'
     start_up_settings = None
     wifi_ssid = None
     wifi_password = None
@@ -51,6 +53,18 @@ class ConfigManager:
     led_on_after_connect = True
     use_ping = True
     has_hard_pins = False
+
+    @staticmethod
+    def file_exists(filename):
+        try:
+            return (os.stat(filename)[0] & 0x4000) == 0
+        except OSError:
+            return False
+
+    def check_for_hard_pins(self):
+        if self.file_exists("hard_pins.json"):
+            self.has_hard_pins = True
+        print("has hard pins: ", self.has_hard_pins)
 
     def __save_last_run_config(self):
         with open(self.last_run_config_path, 'w') as f:
@@ -83,6 +97,7 @@ class ConfigManager:
 
     def get_startup_settings(self):
         self.start_up_settings = self.__load_startup_settings()
+        self.check_for_hard_pins()
         self.version = self.start_up_settings.get("version")
         print('Home Version: ', self.version) 
         self.host_name = self.start_up_settings.get('host')

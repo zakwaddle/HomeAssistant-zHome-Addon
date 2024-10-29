@@ -5,8 +5,11 @@ import json
 
 class Fan:
 
-    def __init__(self, enable_pin, pwm_pin, freq):
+    def __init__(self, enable_pin, pwm_pin, freq, use_enable_pin=None):
         self._platform = sys.platform
+        if use_enable_pin is None:
+            use_enable_pin = True
+        self.use_enable_pin = use_enable_pin
 
         if self._platform not in ['rp2', 'esp32']:
             raise ValueError(f"Unsupported platform: {self._platform}")
@@ -16,20 +19,29 @@ class Fan:
             self.pwm_pin.freq(freq)
         elif self._platform == "esp32":
             self.pwm_pin = machine.PWM(machine.Pin(pwm_pin), freq=freq)
-
-        self.enable_pin = machine.Pin(enable_pin, machine.Pin.OUT)
+        if self.use_enable_pin:
+            self.enable_pin = machine.Pin(enable_pin, machine.Pin.OUT)
         # self.pwm_pin = machine.PWM(machine.Pin(pwm_pin))
+        self.previous_value = 0
         self.power_scale = 100
         self.state = "OFF"
         self.percentage = 50
 
     def on(self):
         self.state = "ON"
-        self.enable_pin.on()
+        if self.use_enable_pin:
+            self.enable_pin.on()
+        else:
+            self.set_power(self.previous_value)
 
     def off(self):
         self.state = "OFF"
-        self.enable_pin.off()
+        if self.use_enable_pin:
+            self.enable_pin.off()
+        else:
+            # self.previous_value = self.percentage
+            # self.percentage = 0
+            self.set_power(0)
 
     def set_duty_cycle(self, duty_cycle):
         if self._platform == "rp2":
@@ -52,6 +64,7 @@ class Fan:
             return value
 
     def set_power(self, power):
+        self.previous_value = self.percentage
         self.percentage = power
         duty = self.convert_to_duty(power)
         self.set_duty_cycle(duty)
@@ -124,7 +137,7 @@ class MQTTFan:
         if topic == self.percentage_command_topic:
             try:
                 percentage = int(msg)
-                self.fan.percentage = percentage
+                # self.fan.percentage = percentage
                 self.fan.set_power(percentage)
             except ValueError:
                 print(f"Invalid brightness value received: {msg}")
@@ -143,6 +156,7 @@ class HomeFan(MQTTFan):
     def __init__(self, home_client, name, sensor_config, topics, sensor_index=None):
         self.pin = sensor_config.get('pin')
         self.enable_pin = sensor_config.get('enable_pin')
+        self.use_enable_pin = sensor_config.get('use_enable_pin')
         self.sensor_index = sensor_index
         freq = sensor_config.get('freq')
         super().__init__(mqtt_client=home_client,
@@ -153,10 +167,19 @@ class HomeFan(MQTTFan):
                          percentage_command_topic=topics.get('percentage_state_topic'),
                          discovery_topic=topics.get('discovery_topic'),
                          availability_topic=topics.get('availability_topic'),
-                         fan=Fan(pwm_pin=self.pin, enable_pin=self.enable_pin, freq=freq))
+                         fan=Fan(pwm_pin=self.pin, 
+                                 enable_pin=self.enable_pin, 
+                                 freq=freq, 
+                                 use_enable_pin=self.use_enable_pin))
 
     def __repr__(self):
-        return f"<HomeFan| {self.name} | pin:{self.pin}>"
+        return f"<HomeFan| {self.name} | pwm_pin:{self.pin}>"
+
+    def setup(self, device_info):
+        self.publish_discovery(device_info)
+        self.publish_online()
+        self.publish_state()
+        self.publish_percentage()
 
     def force_update(self):
         self.publish_online()

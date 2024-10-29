@@ -5,11 +5,13 @@ import os
 
 class FirmwareUploader:
     local_firmware_folder = os.path.abspath(f"{os.path.dirname(__file__)}/../Firmware")
-    local_home_path = f"{local_firmware_folder}/dist"
+    # local_home_path = f"{local_firmware_folder}/dist"
+    local_home_path = f"{local_firmware_folder}/build-dist"
 
     ftp_home_folder = f"/upload/Firmware"
 
     def __init__(self):
+        print('local_firmware_folder:', self.local_firmware_folder)
         self.ftp_uploader = FTPUploader(host="homeassistant.local",
                                         user="microcontrollers",
                                         password="microcontrollers")
