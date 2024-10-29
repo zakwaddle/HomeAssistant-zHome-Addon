@@ -25,6 +25,7 @@ const AddLEDDimmerForm = ({deviceConfigId, deviceName, handleCancel, updateDevic
         const formattedDeviceName = deviceName.toLowerCase().replace(' ', '_')
         const topic = `homeassistant/light/${formattedDeviceName}/${formattedName}`
         const discoveryTopic = `${topic}/config`
+        const availabilityTopic = `${topic}/availability`
         const stateTopic = `${topic}/state`
         const commandTopic = `${topic}/set`
         const brightnessStateTopic = `${topic}/dim/state`
@@ -41,7 +42,8 @@ const AddLEDDimmerForm = ({deviceConfigId, deviceName, handleCancel, updateDevic
                     state_topic: stateTopic,
                     command_topic: commandTopic,
                     brightness_state_topic: brightnessStateTopic,
-                    brightness_command_topic: brightnessCommandTopic
+                    brightness_command_topic: brightnessCommandTopic,
+                    availability_topic: availabilityTopic
                 }
 
             }).then(data => {

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from database import (get_devices, add_device, update_display_name, delete_device, get_device_config, get_device,
+from database import (get_devices, add_device, update_display_name, update_firmware_version, delete_device, get_device_config, get_device,
                       update_device_config, delete_device_config, add_device_config, get_device_sensors,
                       get_wifi_network, get_mqtt_broker, get_ftp_server, update_device_settings)
 # from flask_sse import sse
@@ -52,6 +52,15 @@ def update_device_display_name(device_id):
     name = new_name.get('display_name')
     if name is not None:
         data = update_display_name(device_id, name)
+        return jsonify(success=True, device=data)
+    return jsonify(success=False, device=None)
+
+@device_blueprint.route('/<string:device_id>/firmware_version', methods=['POST'])
+def update_device_firmware_version(device_id):
+    new_version = request.json
+    version = new_version.get('new_version')
+    if version is not None:
+        data = update_firmware_version(device_id, version)
         return jsonify(success=True, device=data)
     return jsonify(success=False, device=None)
 

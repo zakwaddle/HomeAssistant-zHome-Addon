@@ -23,14 +23,14 @@ class MQTTManager:
         self.port = port
         self.username = username
         self.password = password
-        self.mqtt_client = None
+        self.mqtt_client = MQTTClient(self.unit_id, self.server, self.port, self.username, self.password, keepalive=60)
         self.is_connected = False
 
     def connect_mqtt(self, clean_session=True):
         """
         Connects to the MQTT broker with provided server, port, username, and password.
         """
-        self.mqtt_client = MQTTClient(self.unit_id, self.server, self.port, self.username, self.password, keepalive=60)
+        # self.mqtt_client = MQTTClient(self.unit_id, self.server, self.port, self.username, self.password, keepalive=60)
         try:
             self.mqtt_client.connect(clean_session)
             self.is_connected = True
@@ -92,3 +92,20 @@ class MQTTManager:
             print("OSError - possibly lost connection to broker")
             self.is_connected = False
             utime.sleep(3)
+
+    def set_last_will(self, topic: str, message: str):
+        print("setting last will:")
+        print(f"topic: {topic}")
+        print(f"message: {message}")
+        try:
+            self.mqtt_client.set_last_will(topic=topic, msg=message)
+        except OSError:
+            print("OSError - possibly lost connection to broker")
+            self.is_connected = False
+            utime.sleep(3)
+
+    def disconnect(self):
+        try:
+            self.mqtt_client.disconnect()
+        except Exception as e:
+            print(e)

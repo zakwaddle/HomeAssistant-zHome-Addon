@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, JSON, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from .ModelBase import ModelBase
 
@@ -11,6 +11,7 @@ class DeviceSensor(ModelBase):
     name = Column(String)
     sensor_config = Column(JSON)
     device_config_id = Column(String, ForeignKey('device-configs.id'))
+    is_hard_pin = Column(Boolean, default=False)
 
     device_config = relationship("DeviceConfig", back_populates="sensors")  # one-to-many relationship
 
@@ -24,4 +25,5 @@ class DeviceSensor(ModelBase):
             "name": self.name,
             "device_config_id": self.device_config_id,
             "sensor_config": self.sensor_config,
+            "is_hard_pin": self.is_hard_pin
         }

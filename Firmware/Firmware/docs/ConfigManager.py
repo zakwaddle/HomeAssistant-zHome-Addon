@@ -1,9 +1,10 @@
 import json
 import urequests
-import home.Home as home
+import home
 import sys
 import machine
 import ubinascii
+import os
 
 
 class ConfigError(Exception):
@@ -11,32 +12,35 @@ class ConfigError(Exception):
 
 
 class WifiConfig:
-    def __init__(self, id, ssid, password, is_default):
+    def __init__(self, ssid, password):
         self.ssid = ssid
         self.password = password
 
 
 class MQTTConfig:
-    def __init__(self, id, host_address, port, username, password, is_default):
-        self.host = host_address
+    def __init__(self, host, port, username, password):
+        self.host = host
         self.port = port
         self.username = username
         self.password = password
 
 
 class FTPConfig:
-    def __init__(self, id, host_address, username, password, is_default):
-        self.host = host_address
+    def __init__(self, host, username, password):
+        self.host = host
         self.username = username
         self.password = password
 
 
 class ConfigManager:
+    version = None
     start_up_settings_path = '/config.json'
     last_run_config_path = '/last-run-config.json'
+    hard_pins_path = '/hard_pins.json'
     start_up_settings = None
     wifi_ssid = None
     wifi_password = None
+    host_name = None
     host = None
     name = None
     home_device = None
@@ -48,6 +52,19 @@ class ConfigManager:
     ftp = None
     led_on_after_connect = True
     use_ping = True
+    has_hard_pins = False
+
+    @staticmethod
+    def file_exists(filename):
+        try:
+            return (os.stat(filename)[0] & 0x4000) == 0
+        except OSError:
+            return False
+
+    def check_for_hard_pins(self):
+        if self.file_exists("hard_pins.json"):
+            self.has_hard_pins = True
+        print("has hard pins: ", self.has_hard_pins)
 
     def __save_last_run_config(self):
         with open(self.last_run_config_path, 'w') as f:
@@ -63,11 +80,7 @@ class ConfigManager:
 
     def __save_startup_settings(self):
         with open(self.start_up_settings_path, 'w') as f:
-            json.dump({
-                "host": self.host,
-                "wifi_ssid": self.wifi_ssid,
-                "wifi_password": self.wifi_password
-            }, f)
+            json.dump(self.start_up_settings, f)
 
     def __load_startup_settings(self):
         try:
@@ -84,18 +97,28 @@ class ConfigManager:
 
     def get_startup_settings(self):
         self.start_up_settings = self.__load_startup_settings()
-        self.host = self.start_up_settings.get('host')
-        self.wifi_ssid = self.start_up_settings.get('wifi_ssid')
-        self.wifi_password = self.start_up_settings.get('wifi_password')
+        self.check_for_hard_pins()
+        self.version = self.start_up_settings.get("version")
+        print('Home Version: ', self.version) 
+        self.host_name = self.start_up_settings.get('host')
+        log_level = self.start_up_settings.get("log_level")
+        if log_level is not None:
+            self.home_client.log_level = log_level
+        if self.host_name is not None:
+            self.host = f"http://{self.host_name}.local:5000"
+            
+        wifi = self.start_up_settings.get('wifi')
+        self.wifi = WifiConfig(**wifi) if wifi is not None else None
+        
 
     def request_device_config(self):
         url = f'{self.host}/api/home/devices/{self.device_id}'
         print(f'requesting settings from: {url}')
-
         response = urequests.get(url)
         if response.status_code == 200:
             print(f'received settings')
             self.home_device = response.json()
+
 
     def announce_device_to_home_server(self):
         response = urequests.post(f'{self.host}/api/home/devices/add', json={
@@ -105,14 +128,30 @@ class ConfigManager:
             "device_info": {
                 "name": self.name,
                 "manufacturer": "ZRW",
-                "model": f"{self.platform.upper()}-Circuit",
-                "identifiers": self.device_id
+                "model": f"{self.platform.upper()}-{self.start_up_settings.get('model')}",
+                "identifiers": self.device_id,
+                "sw_version": self.start_up_settings.get('version')
             }})
         print("announcing device...")
         if response.status_code == 200:
             data = response.json()
             print("device added")
             self.home_device = data['device']
+
+
+    def update_device_on_home_server(self):
+        firmware_version = self.start_up_settings.get('version')
+        server_device = self.home_device if self.home_device is not None else None
+        device_info = server_device.get('device_info') if server_device is not None else None
+        server_version = device_info.get("sw_version")
+        print(server_version, firmware_version)
+        if device_info.get("sw_version") != firmware_version:
+            response = urequests.post(f'{self.host}/api/home/devices/{self.home_device.get('id')}/firmware_version', json={
+                "new_version": firmware_version
+                })
+            if response.status_code == 200:
+                print(f"updated version on home server to {firmware_version}")
+            
 
     def parse_config(self):
         self.name = self.home_device.get('display_name')
@@ -127,14 +166,10 @@ class ConfigManager:
             use_ping = device_settings.get('use_ping')
             self.use_ping = use_ping if use_ping is not None else self.use_ping
 
-        wifi_config = self.device_config.get('wifi_network')
-        mqtt_config = self.device_config.get('mqtt_broker')
-        ftp_config = self.device_config.get('ftp_server')
-        self.wifi = WifiConfig(**wifi_config) if wifi_config is not None else None
-        self.mqtt = MQTTConfig(**mqtt_config) if mqtt_config is not None else None
-        self.ftp = FTPConfig(**ftp_config) if ftp_config is not None else None
 
     def obtain_config(self):
+        self.get_mqtt_details()
+        self.get_ftp_details()
         self.request_device_config()
         if self.home_device is not None:
             self.__save_last_run_config()
@@ -142,6 +177,7 @@ class ConfigManager:
             self.__load_last_run_config()
         if self.home_device is None:
             self.announce_device_to_home_server()
+        
         if self.home_device is None:
             raise ConfigError('Unable to locate device configs')
 
@@ -152,3 +188,26 @@ class ConfigManager:
         has_wifi_password = self.wifi_password is not None and self.wifi_password
         if has_host and has_wifi_ssid and has_wifi_password:
             self.__save_startup_settings()
+
+    def get_mqtt_details(self):
+        response = urequests.get(f'{self.host}/api/mqtt')
+        if response.status_code == 200:
+            mqtt = response.json()
+            mqtt_host = f"{self.host_name}.local"
+            self.mqtt = MQTTConfig(
+                host=mqtt_host, 
+                port=mqtt.get("port"), 
+                username=mqtt.get("username"), 
+                password=mqtt.get("password")
+                )
+        
+    def get_ftp_details(self):
+        ftp = self.start_up_settings.get('ftp')
+        self.ftp = FTPConfig(**ftp) if ftp is not None else None
+
+    def update_log_level(self, new_log_level:int):
+        if 0 < new_log_level < 6:
+            self.start_up_settings['log_level'] = new_log_level
+            self.__save_startup_settings
+            self.home_client.log_level = new_log_level
+            self.home_client.log(f"updated log_level to: {new_log_level}", log_level=2)

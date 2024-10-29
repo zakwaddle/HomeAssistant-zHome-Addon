@@ -10,12 +10,14 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
     const [name, setName] = useState('');
     const [pin, setPin] = useState(null);
     const [enablePin, setEnablePin] = useState(null);
+    const [useEnablePin, setUseEnablePin] = useState(true);
     const [freq, setFreq] = useState(30000);
     const clearFields = () => {
         setName('')
         setPin(null)
         setEnablePin(null)
         setFreq(30000)
+        setUseEnablePin(true)
     }
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -23,6 +25,7 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
         const formattedDeviceName = deviceName.toLowerCase().replace(' ', '_')
         const topic = `homeassistant/fan/${formattedDeviceName}/${formattedName}`
         const discoveryTopic = `${topic}/config`
+        const availabilityTopic = `${topic}/availability`
         const stateTopic = `${topic}/state`
         const commandTopic = `${topic}/set`
         const percentageStateTopic = `${topic}/dim/state`
@@ -33,12 +36,14 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
                 pin: pin,
                 enable_pin: enablePin,
                 freq: freq,
+                use_enable_pin: useEnablePin,
                 topics: {
                     discovery_topic: discoveryTopic,
                     state_topic: stateTopic,
                     command_topic: commandTopic,
                     percentage_state_topic: percentageStateTopic,
-                    percentage_command_topic: percentageCommandTopic
+                    percentage_command_topic: percentageCommandTopic,
+                    availability_topic: availabilityTopic
                 }
 
             }).then(data => {
@@ -60,13 +65,19 @@ const AddFanForm = ({deviceConfigId, deviceName, handleCancel, updateDevice}) =>
                 <FormInput type="number" value={pin} onChange={e => setPin(Number(e.target.value))}/>
             </FormLabel>
             <FormLabel>
-                Enable Pin
-                <FormInput type="number" value={enablePin} onChange={e => setEnablePin(Number(e.target.value))}/>
-            </FormLabel>
-            <FormLabel>
                 Frequency
                 <FormInput type="number" value={freq} onChange={e => setFreq(Number(e.target.value))}/>
             </FormLabel>
+            <FormLabel>
+                Use Enable Pin
+                <input type={'checkbox'}
+                                   checked={useEnablePin}
+                                   onChange={event => setUseEnablePin(event.target.checked)}/>
+            </FormLabel>
+            {useEnablePin && <FormLabel>
+                Enable Pin
+                <FormInput type="number" value={enablePin} onChange={e => setEnablePin(Number(e.target.value))}/>
+            </FormLabel>}
 
             <div>
                 <Button onClick={handleCancel && handleCancel}>Cancel</Button>

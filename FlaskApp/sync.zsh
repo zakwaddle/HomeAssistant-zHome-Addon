@@ -4,7 +4,7 @@ SOURCE_DIR="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/"
 DEST_DIR="root@homeassistant.local:~/addons/FlaskApp/"
 
 # List of directories and files to exclude
-EXCLUDE_PATTERNS=('.idea' '__pycache__' '.pyc' '*/__pycache__' 'venv' 'data' 'tests' 'sync.zsh' 'log_entries.db')
+EXCLUDE_PATTERNS=('.idea' '__pycache__' '*.pyc' '*/__pycache__' 'venv' 'data' 'tests' 'sync.zsh' 'log_entries.db' '.DS_Store')
 
 # Function to copy files excluding the specified patterns
 copy_files_excluding() {
@@ -22,3 +22,17 @@ copy_files_excluding() {
 
 # Execute the copy function
 copy_files_excluding
+
+
+# copy the stuff that the function is missing
+
+SOURCE_FILE="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/database/__init__.py"
+DEST_DIR2="root@homeassistant.local:~/addons/FlaskApp/database/"
+
+scp -r "$SOURCE_FILE" "$DEST_DIR2"
+
+
+SOURCE_FILE3="/Users/zakwaddle/GitHub/HomeAssistant-zHome-Addon/FlaskApp/.flaskenv"
+DEST_DIR3="root@homeassistant.local:~/addons/FlaskApp/"
+
+scp -r "$SOURCE_FILE3" "$DEST_DIR3"

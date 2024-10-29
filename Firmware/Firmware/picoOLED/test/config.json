@@ -1,0 +1,18 @@
+{
+  "version": "0.0.18",
+  "host": "homeassistant",
+  "log_level": 1,
+
+  "wifi": {
+    "ssid": "the_interwebs",
+    "password": "935Ravine"
+  },
+
+  "ftp": {
+    "host": "homeassistant.local",
+    "username" : "microcontrollers",
+    "password" : "microcontrollers"
+  },
+
+  "model": "dev-board"
+}

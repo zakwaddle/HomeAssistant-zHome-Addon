@@ -6,6 +6,7 @@ import AddMotionSensorForm from "./AddMotionSensorForm";
 import AddWeatherSensorForm from "./AddWeatherSensorForm";
 import AddLEDDimmerForm from "./AddLEDDimmerForm";
 import AddFanForm from "./AddFanForm";
+import AddButtonForm from "./AddButtonForm";
 import {Button} from "../../../../styles/SectionStyles";
 
 const AddSensorContainer = styled.div`
@@ -35,6 +36,8 @@ const AddSensorView = () => {
                 <Button onClick={() => setSensorType('weather')}>Weather Sensor</Button>
                 <Button onClick={() => setSensorType('led')}>LED Dimmer</Button>
                 <Button onClick={() => setSensorType('fan')}>Fan</Button>
+                <Button onClick={() => setSensorType('button')}>Button</Button>
+                <Button onClick={() => setDetailsView()}>Cancel</Button>
             </Wrapper>
         ),
         "motion": <AddMotionSensorForm updateDevice={updateDevice}
@@ -50,6 +53,10 @@ const AddSensorView = () => {
                                  deviceConfigId={config.id}
                                  handleCancel={setDetailsView}/>,
         "fan": <AddFanForm updateDevice={updateDevice}
+                           deviceName={selectedDevice.display_name}
+                           deviceConfigId={config.id}
+                           handleCancel={setDetailsView}/>,
+        "button": <AddButtonForm updateDevice={updateDevice}
                            deviceName={selectedDevice.display_name}
                            deviceConfigId={config.id}
                            handleCancel={setDetailsView}/>,

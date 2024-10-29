@@ -29,5 +29,6 @@ def mqtt_decorator(func):
 @mqtt_decorator
 def send_mqtt_message(mqtt_client, topic, message):
     mqtt_client.publish(topic, message)
+    print(f"published message: \ntopic: {topic}\nmessage: {message}", flush=True)
 
 

@@ -88,7 +88,8 @@ class DimmableLight:
 class MQTTDimmableLight:
     def __init__(self, mqtt_client, light: DimmableLight,
                  name=None, state_topic=None, command_topic=None,
-                 brightness_state_topic=None, brightness_command_topic=None, discovery_topic=None):
+                 brightness_state_topic=None, brightness_command_topic=None, 
+                 discovery_topic=None, availability_topic=None):
         self.mqtt_client = mqtt_client
         self.light = light
         self.name = f"LED-{self.light.timer_n}" if name is None else name
@@ -97,11 +98,7 @@ class MQTTDimmableLight:
         self.brightness_state_topic = brightness_state_topic
         self.brightness_command_topic = brightness_command_topic
         self.discovery_topic = discovery_topic
-        # self.topic = f"homeassistant/light/{self.mqtt_client.unit_id}/{self.name.lower().replace(' ', '_')}"
-        # self.state_topic = f"{self.topic}/state"
-        # self.command_topic = f"{self.topic}/set"
-        # self.brightness_state_topic = f"{self.topic}/dim"
-        # self.brightness_command_topic = f"{self.topic}/dim/set"
+        self.availability_topic = availability_topic
         self.subscribe_to = [self.command_topic, self.brightness_command_topic]
 
     def publish_state(self):
@@ -112,13 +109,23 @@ class MQTTDimmableLight:
         self.mqtt_client.publish(self.brightness_state_topic, str(self.light.target_brightness))
         print(f"\nPublished Brightness: {self.light.target_brightness}")
 
+    def publish_online(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "online")
+            print(f"\nPublished LED Availability: online")
+
+    def publish_offline(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "offline")
+            print(f"\nPublished LED Availability: offline")
+
     def set_name(self, name):
         self.name = name
 
     def publish_discovery(self, device_info):
-        # discovery_topic = f"{self.topic}/config"
         print(f"{self.name} Discovery Topic: ", self.discovery_topic)
         print(f"{self.name} State Topic: ", self.state_topic)
+        print(f"{self.name} Availablity Topic: ", self.availability_topic)
         config = {
             "name": self.name,
             "device_class": "light",
@@ -133,6 +140,8 @@ class MQTTDimmableLight:
             "unique_id": f"{self.mqtt_client.config_manager.name}-{self.name}",
 
         }
+        if self.availability_topic is not None:
+            config["availability"] = [{'topic': self.availability_topic}]
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
     def on_message(self, topic, msg):
@@ -176,6 +185,7 @@ class HomeLEDDimmer(MQTTDimmableLight):
                          brightness_state_topic=topics.get('brightness_state_topic'),
                          brightness_command_topic=topics.get('brightness_command_topic'),
                          discovery_topic=topics.get('discovery_topic'),
+                         availability_topic=topics.get('availability_topic'),
                          light=DimmableLight(pin=self.pin,
                                              freq=freq,
                                              timer_n=sensor_index,
@@ -184,3 +194,14 @@ class HomeLEDDimmer(MQTTDimmableLight):
 
     def __repr__(self):
         return f"<HomeLEDDimmer| {self.name} | pin:{self.pin}>"
+    
+    def setup(self, device_info):
+        self.publish_discovery(device_info)
+        self.publish_online()
+        self.publish_brightness()
+        self.publish_state()
+
+    def force_update(self):
+        self.publish_online()
+        self.publish_state()
+        self.publish_brightness()

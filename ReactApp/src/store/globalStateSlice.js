@@ -67,12 +67,15 @@ const globalStateSlice = createSlice({
         },
         updateMenuSelection(state, action) {
             state.menuSelection = action.payload
+            // state.selectedDevice = null
+            // state.selectedSensor = null
         },
         updateShowConnectionForm(state, action) {
             state.showConnectionForm = action.payload
         },
         updateSelectedDevice(state, action) {
             state.selectedDevice = action.payload
+            // state.selectedSensor = null
         },
         updateSelectedSensor(state, action) {
             state.selectedSensor = action.payload

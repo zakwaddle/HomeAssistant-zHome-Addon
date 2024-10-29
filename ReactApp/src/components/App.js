@@ -3,7 +3,6 @@ import GlobalStyle from "../styles/GlobalStyles";
 import styled from 'styled-components';
 import LogSection from "./Logs";
 import ControlSection from "./Controls/ControlSection";
-// import useSSE from "../hooks/useSSE";
 import Menu from "./Controls/Menu/Menu";
 import {useSelector} from "react-redux";
 
@@ -20,7 +19,6 @@ const AppContainer = styled.div`
 `
 
 export default function App() {
-    // useSSE();
     const menuSelection = useSelector(state => state['globalState']['menuSelection'])
     return (
         <AppContainer>

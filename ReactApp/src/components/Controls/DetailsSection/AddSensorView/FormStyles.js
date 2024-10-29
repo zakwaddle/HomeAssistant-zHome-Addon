@@ -6,5 +6,5 @@ export const AddSensorFormContainer = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: burlywood;
+  // background-color: burlywood;
 `

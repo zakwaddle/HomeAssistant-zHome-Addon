@@ -5,8 +5,11 @@ import json
 
 class Fan:
 
-    def __init__(self, enable_pin, pwm_pin, freq):
+    def __init__(self, enable_pin, pwm_pin, freq, use_enable_pin=None):
         self._platform = sys.platform
+        if use_enable_pin is None:
+            use_enable_pin = True
+        self.use_enable_pin = use_enable_pin
 
         if self._platform not in ['rp2', 'esp32']:
             raise ValueError(f"Unsupported platform: {self._platform}")
@@ -16,20 +19,29 @@ class Fan:
             self.pwm_pin.freq(freq)
         elif self._platform == "esp32":
             self.pwm_pin = machine.PWM(machine.Pin(pwm_pin), freq=freq)
-
-        self.enable_pin = machine.Pin(enable_pin, machine.Pin.OUT)
+        if self.use_enable_pin:
+            self.enable_pin = machine.Pin(enable_pin, machine.Pin.OUT)
         # self.pwm_pin = machine.PWM(machine.Pin(pwm_pin))
+        self.previous_value = 0
         self.power_scale = 100
         self.state = "OFF"
         self.percentage = 50
 
     def on(self):
         self.state = "ON"
-        self.enable_pin.on()
+        if self.use_enable_pin:
+            self.enable_pin.on()
+        else:
+            self.set_power(self.previous_value)
 
     def off(self):
         self.state = "OFF"
-        self.enable_pin.off()
+        if self.use_enable_pin:
+            self.enable_pin.off()
+        else:
+            # self.previous_value = self.percentage
+            # self.percentage = 0
+            self.set_power(0)
 
     def set_duty_cycle(self, duty_cycle):
         if self._platform == "rp2":
@@ -52,6 +64,7 @@ class Fan:
             return value
 
     def set_power(self, power):
+        self.previous_value = self.percentage
         self.percentage = power
         duty = self.convert_to_duty(power)
         self.set_duty_cycle(duty)
@@ -62,7 +75,7 @@ class MQTTFan:
 
     def __init__(self, mqtt_client, fan: Fan,
                  name=None, state_topic=None, command_topic=None,
-                 percentage_state_topic=None, percentage_command_topic=None, discovery_topic=None):
+                 percentage_state_topic=None, percentage_command_topic=None, discovery_topic=None, availability_topic=None):
         self.mqtt_client = mqtt_client
         self.fan = fan
         self.name = f"MQTTFan" if name is None else name
@@ -71,6 +84,7 @@ class MQTTFan:
         self.percentage_state_topic = percentage_state_topic
         self.percentage_command_topic = percentage_command_topic
         self.discovery_topic = discovery_topic
+        self.availability_topic = availability_topic
         self.subscribe_to = [self.command_topic, self.percentage_command_topic]
 
     def publish_state(self):
@@ -81,11 +95,20 @@ class MQTTFan:
         self.mqtt_client.publish(self.percentage_state_topic, str(self.fan.percentage))
         print(f"\nPublished Percentage: {self.fan.percentage}")
 
+    def publish_online(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "online")
+            print(f"\nPublished Fan Availability: online")
+
+    def publish_offline(self):
+        if self.availability_topic is not None:
+            self.mqtt_client.publish(self.availability_topic, "offline")
+            print(f"\nPublished Fan Availability: offline")
+
     def set_name(self, name):
         self.name = name
 
     def publish_discovery(self, device_info):
-        # discovery_topic = f"{self.topic}/config"
         print(f"{self.name} Discovery Topic: ", self.discovery_topic)
         print(f"{self.name} State Topic: ", self.state_topic)
         config = {
@@ -102,6 +125,8 @@ class MQTTFan:
             "unique_id": f"{self.mqtt_client.config_manager.name}-{self.name}",
 
         }
+        if self.availability_topic is not None:
+            config["availability"] = [{'topic': self.availability_topic}]
         self.mqtt_client.publish(self.discovery_topic, json.dumps(config), retain=True)
 
     def on_message(self, topic, msg):
@@ -112,20 +137,17 @@ class MQTTFan:
         if topic == self.percentage_command_topic:
             try:
                 percentage = int(msg)
-                self.fan.percentage = percentage
+                # self.fan.percentage = percentage
                 self.fan.set_power(percentage)
-                # self.publish_percentage()
             except ValueError:
                 print(f"Invalid brightness value received: {msg}")
         elif topic == self.command_topic:
             if msg == "ON":
                 self.fan.on()
-                # self.publish_percentage()
                 self.publish_state()
 
             elif msg == "OFF":
                 self.fan.off()
-                # self.publish_percentage()
                 self.publish_state()
 
 
@@ -134,10 +156,9 @@ class HomeFan(MQTTFan):
     def __init__(self, home_client, name, sensor_config, topics, sensor_index=None):
         self.pin = sensor_config.get('pin')
         self.enable_pin = sensor_config.get('enable_pin')
+        self.use_enable_pin = sensor_config.get('use_enable_pin')
         self.sensor_index = sensor_index
         freq = sensor_config.get('freq')
-        # brightness_scale = sensor_config.get('brightness_scale')
-        # print(f'pin: {self.pin} - enable_pin = {self.enable_pin} - index = {self.sensor_index}')
         super().__init__(mqtt_client=home_client,
                          name=name,
                          state_topic=topics.get('state_topic'),
@@ -145,7 +166,23 @@ class HomeFan(MQTTFan):
                          percentage_state_topic=topics.get('percentage_state_topic'),
                          percentage_command_topic=topics.get('percentage_state_topic'),
                          discovery_topic=topics.get('discovery_topic'),
-                         fan=Fan(pwm_pin=self.pin, enable_pin=self.enable_pin, freq=freq))
+                         availability_topic=topics.get('availability_topic'),
+                         fan=Fan(pwm_pin=self.pin, 
+                                 enable_pin=self.enable_pin, 
+                                 freq=freq, 
+                                 use_enable_pin=self.use_enable_pin))
 
     def __repr__(self):
-        return f"<HomeFan| {self.name} | pin:{self.pin}>"
+        return f"<HomeFan| {self.name} | pwm_pin:{self.pin}>"
+
+    def setup(self, device_info):
+        self.publish_discovery(device_info)
+        self.publish_online()
+        self.publish_state()
+        self.publish_percentage()
+
+    def force_update(self):
+        self.publish_online()
+        self.publish_state()
+        self.publish_percentage()
+

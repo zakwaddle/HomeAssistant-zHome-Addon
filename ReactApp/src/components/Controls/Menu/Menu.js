@@ -50,7 +50,7 @@ const Menu = () => {
     return (
         <MenuBox>
             <MenuItem>Devices</MenuItem>
-            <MenuItem>Connections</MenuItem>
+            {/* <MenuItem>Connections</MenuItem> */}
             <MenuItem>Logs</MenuItem>
         </MenuBox>
     )
