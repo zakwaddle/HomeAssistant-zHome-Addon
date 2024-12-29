@@ -15,7 +15,8 @@ const GlobalStyle = createGlobalStyle`
   
   body {
     font-size: 12px;
-    background-color: whitesmoke;
+    color: #e1e1e1;
+    background-color: #111111;
     @media (max-width: 429px) {
       font-size: 14px;
     }

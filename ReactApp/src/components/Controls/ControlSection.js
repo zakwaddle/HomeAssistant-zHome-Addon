@@ -27,7 +27,8 @@ const InfoWindow = styled.div`
   flex-direction: column;
   //justify-content: center;
 
-  background-color: white;
+  // background-color: white;
+  background-color: #202020;
   border: 1px solid darkgrey;
   border-radius: 1em;
 
@@ -50,7 +51,8 @@ const DetailsWindow = styled.div`
   display: flex;
   flex-direction: column;
 
-  background-color: white;
+  // background-color: white;
+  background-color: #202020;
   border: 1px solid darkgrey;
   border-radius: 1em;
 

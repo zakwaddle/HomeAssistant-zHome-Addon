@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Button = styled.button`
   font-family: monospace;
   font-size: inherit;
+  color: #e1e1e1;
   background-color: inherit;
   border-radius: .3em;
   border-width: 1px;

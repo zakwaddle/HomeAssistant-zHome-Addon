@@ -68,7 +68,6 @@ def on_message(client, userdata, msg):
         if topics and topics is not None:
             for i in topics:
                 print(f"sending 'offline' to: {i}", flush=True)
-                # send_mqtt_message(i, "offline")
                 client.publish(i, "offline")
 
 

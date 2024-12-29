@@ -147,17 +147,14 @@ class ConfigManager:
         print(server_version, firmware_version)
         if device_info.get("sw_version") != firmware_version:
             response = urequests.post(f'{self.host}/api/home/devices/{self.home_device.get('id')}/firmware_version', json={
-            # urequests.post(f'{self.host}/api/home/devices/{self.home_device.get('id')}/firmware_version', json={
                 "new_version": firmware_version
                 })
-            # self.home_client.log(f"updated version to {firmware_version}")
             try:
                 data = response.json()
                 if data.get('success'):
                     self.home_client.log(f"updated version to {firmware_version}")
             except json.JSONDecodeError:
                 pass
-            # if response.status_code == 200:
             
 
     def parse_config(self):
@@ -169,8 +166,8 @@ class ConfigManager:
         device_settings = self.device_config.get('device_settings')
         if device_settings is not None:
             led_on = device_settings.get('led_on_after_connect')
-            self.led_on_after_connect = led_on if led_on is not None else self.led_on_after_connect
             use_ping = device_settings.get('use_ping')
+            self.led_on_after_connect = led_on if led_on is not None else self.led_on_after_connect
             self.use_ping = use_ping if use_ping is not None else self.use_ping
 
 

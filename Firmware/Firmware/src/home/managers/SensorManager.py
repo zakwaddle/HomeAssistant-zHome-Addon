@@ -32,78 +32,6 @@ class SensorManager:
                 self.sensors.append(sensor)
                 self.home_client.log(f"sensor {sensor} online")
 
-    #         if sensor_type == "motion":
-    #             self.create_motion_sensor(name, sensor_config, topics, sensor_index)
-    #         elif sensor_type == "led":
-    #             self.create_led_dimmer(name, sensor_config, topics, sensor_index)
-    #         elif sensor_type == "fan":
-    #             self.create_fan(name, sensor_config, topics, sensor_index)
-    #         elif sensor_type == "weather":
-    #             self.create_weather_sensor(name, sensor_config, topics, sensor_index)
-    #         elif sensor_type == "button":
-    #             self.create_button(name, sensor_config, topics, sensor_index)
-
-    # def create_sensor(self, name, sensor_config, topics, sensor_index):
-    #     _sensors = {
-    #         "motion": HomeMotionSensor,
-    #         "led": HomeLEDDimmer,
-    #         "fan": HomeFan,
-    #         "weather": HomeWeatherSensor,
-    #         "button": HomeButton,
-    #     }
-
-    # def create_motion_sensor(self, name, sensor_config, topics, sensor_index):
-    #     motion = HomeMotionSensor(self.home_client, name, sensor_config, topics, sensor_index)
-    #     # motion.publish_discovery(self.device_info)
-    #     # motion.enable_interrupt()
-    #     # motion.publish_online()
-    #     # motion.publish_last_motion()
-    #     motion.setup(self.device_info)
-    #     self.sensors.append(motion)
-    #     self.home_client.log(f"motion sensor {motion} online")
-
-    # def create_button(self, name, sensor_config, topics, sensor_index):
-    #     button = HomeButton(self.home_client, name, sensor_config, topics, sensor_index)
-    #     button.setup(self.device_info)
-    #     # button.publish_discovery(self.device_info)
-    #     # button.enable_interrupt()
-    #     # button.publish_online()
-    #     # button.set_last_will()
-    #     self.sensors.append(button)
-    #     self.home_client.log(f"button {button} online")
-
-    # def create_led_dimmer(self, name, sensor_config, topics, sensor_index):
-    #     led = HomeLEDDimmer(self.home_client, name, sensor_config, topics, sensor_index)
-    #     # led.publish_discovery(self.device_info)
-    #     # led.publish_online()
-    #     # led.publish_brightness()
-    #     # led.publish_state()
-    #     led.setup(self.device_info)
-
-    #     self.sensors.append(led)
-    #     self.home_client.log(f"LED {led} online")
-
-    # def create_fan(self, name, sensor_config, topics, sensor_index):
-    #     fan = HomeFan(self.home_client, name, sensor_config, topics, sensor_index)
-    #     # fan.publish_discovery(self.device_info)
-    #     # fan.publish_online()
-    #     # fan.publish_state()
-    #     # fan.publish_percentage()
-    #     fan.setup(self.device_info)
-
-    #     self.sensors.append(fan)
-    #     self.home_client.log(f"fan {fan} online")
-
-    # def create_weather_sensor(self, name, sensor_config, topics, sensor_index):
-    #     # measurement_interval_ms = sensor_config.get('measurement_interval_ms')
-    #     weather = HomeWeatherSensor(self.home_client, name, sensor_config, topics, sensor_index)
-    #     # weather.enable_interrupt(measurement_interval_ms)
-    #     # weather.publish_discovery(self.device_info)
-    #     # weather.publish_online()
-    #     weather.setup(self.device_info)
-    #     self.sensors.append(weather)
-    #     self.home_client.log(f"temperture sensor {weather} online")
-
     def publish_online(self):
         for sensor in self.sensors:
             try:
@@ -130,6 +58,4 @@ class SensorManager:
         for s in self.sensors:
             if hasattr(s, 'on_message'):
                 s.on_message(topic, msg)
-
-
 

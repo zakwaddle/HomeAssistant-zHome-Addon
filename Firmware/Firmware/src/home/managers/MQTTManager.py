@@ -30,7 +30,6 @@ class MQTTManager:
         """
         Connects to the MQTT broker with provided server, port, username, and password.
         """
-        # self.mqtt_client = MQTTClient(self.unit_id, self.server, self.port, self.username, self.password, keepalive=60)
         try:
             self.mqtt_client.connect(clean_session)
             self.is_connected = True
@@ -109,3 +108,4 @@ class MQTTManager:
             self.mqtt_client.disconnect()
         except Exception as e:
             print(e)
+
